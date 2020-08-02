@@ -1,3 +1,7 @@
+import json
+import os
+from os.path import abspath, dirname, join
+from django.core.exceptions import ImproperlyConfigured
 """
 Django settings for hongsi project.
 
@@ -13,14 +17,22 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+secrets_file = join(BASE_DIR, './secrets.json')
+with open(secrets_file) as f:
+    secrets = json.loads(f.read())
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
+def get_secret(setting, secrets=secrets):
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(setting)
+        raise ImproperlyConfigured(error_msg)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '%r3^n=j7yq!5iv-!h&j21z%#_0=p7qkg5w%&4&&+v6zqgc3mf)'
+
+SECRET_KEY = get_secret('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

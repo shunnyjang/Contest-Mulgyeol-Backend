@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from volunteer.models import Post, Tag, Volunteer
+from volunteer.models import Post, Tag, Volunteer, UserVolunteer
+from accounts.models import User
 from accounts.serializers import UserSerializer
 
 class TagSerializer(serializers.ModelSerializer):
@@ -20,16 +21,29 @@ class PostSerializer(serializers.ModelSerializer):
             'created_at',
             'image',
             'information',
-            'on_going'
+            'on_going',
+            'tags'
+        ]
+
+
+class UserVolunteerSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = UserVolunteer
+        fields = [
+            'id',
+            'user',
+            'volunteer'
         ]
 
 
 class VolunteerSerializer(serializers.ModelSerializer):
-    volunteers = UserSerializer(many=True, read_only=True)
+    volunteers = UserVolunteerSerializer(many=True, read_only=True)
 
     class Meta:
         model = Volunteer
         fields = [
+            'id',
             'shelter',
             'date',
             'limit_of_volunteer',

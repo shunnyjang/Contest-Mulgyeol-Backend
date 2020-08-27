@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import Shelter
+from accounts.models import Shelter, User
 
 #image
 import os
@@ -26,8 +26,18 @@ class Post(models.Model):
 class Tag(models.Model):
     tag = models.CharField("봉사 모집 태그", max_length=5)
 
+    def __str__(self):
+        return self.tag
+
 class Volunteer(models.Model):
     shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE)
     date = models.DateField()
     limit_of_volunteer = models.PositiveIntegerField(default=9)
     num_of_volunteer = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ('-date',)
+
+class UserVolunteer(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE)

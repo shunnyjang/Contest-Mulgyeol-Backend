@@ -30,6 +30,25 @@ class UserCreateView(APIView):
                 "message": serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
+class CheckIdView(APIView):
+    def get(self, request, format=None):
+        try:
+            user = User.objects.get(userID=request.data.get('id'))
+            if user:
+                return Response({"result": "False"}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({"result": "True"}, status=status.HTTP_200_OK)
+
+
+class CheckIdView(APIView):
+    def get(self, request, format=None):
+        try:
+            user = User.objects.get(userID=request.data.get('id'))
+            if user:
+                return Response({"result": "False"})
+        except User.DoesNotExist:
+            return Response({"result": "True"})
+
 
 class ShelterCreateView(APIView):
     permission_classes = [AllowAny]
@@ -108,7 +127,10 @@ class PhoneAuthView(APIView):
             return Response({'message': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             result = check_auth_number(p_num, a_num)
-            return Response({'message': 'OK', 'result': result})
+            if result:
+                return Response({'message': 'Success'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'Fail'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         try:

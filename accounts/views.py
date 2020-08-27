@@ -31,6 +31,16 @@ class UserCreateView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
+class CheckIdView(APIView):
+    def get(self, request, format=None):
+        try:
+            user = User.objects.get(userID=request.data.get('id'))
+            if user:
+                return Response({"result": "False"})
+        except User.DoesNotExist:
+            return Response({"result": "True"})
+
+
 class ShelterCreateView(APIView):
     permission_classes = [AllowAny]
 

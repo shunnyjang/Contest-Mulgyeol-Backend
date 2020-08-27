@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'storages',
-    'taggit',
     'accounts',
     'volunteer',
     'community'

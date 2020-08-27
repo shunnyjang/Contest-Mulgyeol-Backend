@@ -37,7 +37,7 @@ class CheckIdView(APIView):
             if user:
                 return Response({"result": "False"}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
-            return Response({"result": "True"}, status=status.HTTP_200_OK)
+            return Response({"result": "True"}, status=status.HTTP_200_OK) 
 
 
 class CheckIdView(APIView):

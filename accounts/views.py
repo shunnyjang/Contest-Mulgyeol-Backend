@@ -118,7 +118,10 @@ class PhoneAuthView(APIView):
             return Response({'message': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             result = check_auth_number(p_num, a_num)
-            return Response({'message': 'OK', 'result': result})
+            if result:
+                return Response({'message': 'Success'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'Fail'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         try:

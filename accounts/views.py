@@ -33,31 +33,12 @@ class UserCreateView(APIView):
 class CheckIdView(APIView):
     def get(self, request, format=None):
         try:
-            user = User.objects.get(userID=request.data.get('id'))
+            id = request.query_params['id']
+            user = User.objects.get(userID=id)
             if user:
                 return Response({"result": "False"}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({"result": "True"}, status=status.HTTP_200_OK) 
-
-
-class CheckIdView(APIView):
-    def get(self, request, format=None):
-        try:
-            user = User.objects.get(userID=request.data.get('id'))
-            if user:
-                return Response({"result": "False"})
-        except User.DoesNotExist:
-            return Response({"result": "True"})
-
-
-class CheckIdView(APIView):
-    def get(self, request, format=None):
-        try:
-            user = User.objects.get(userID=request.data.get('id'))
-            if user:
-                return Response({"result": "False"})
-        except User.DoesNotExist:
-            return Response({"result": "True"})
 
 
 class ShelterCreateView(APIView):

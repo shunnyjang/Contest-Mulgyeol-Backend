@@ -59,9 +59,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('2', '보호소 담당자'),
     )
     
-    userID = models.CharField(max_length=21, unique=True)
+    userID = models.CharField(max_length=21, blank=False, unique=True)
     name = models.CharField(max_length=10)
-    phone = models.CharField(max_length=11, unique=True)
+    phone = models.CharField(max_length=11, blank=False, unique=True)
     role = models.CharField(max_length=2, choices=ROLE_CHOICES)
     is_staff = models.BooleanField(default=False)
 
@@ -86,6 +86,9 @@ class Shelter(models.Model):
     content = models.TextField("보호소 소개", blank=True)
     caution = models.TextField("봉사 주의사항", blank=True)
 
+    def __str__(self):
+        return "[%s] %s" % (self.loc_short, self.shelter_name)
+    
     @property
     def is_shelter_staff(self):
         return self.user.role == '2'

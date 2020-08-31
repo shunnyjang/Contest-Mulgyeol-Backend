@@ -4,10 +4,11 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 
-from accounts.models import User
+from accounts.models import User, Shelter
 from volunteer.models import Post, Tag, Volunteer, UserVolunteer
 from volunteer.serializers import PostSerializer, VolunteerSerializer, UserVolunteerSerializer
 
+from django.contrib.auth import get_user_model
 
 class PostView(APIView):
 
@@ -21,6 +22,17 @@ class PostView(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
+        User = get_user_model()
+        user = User.objects.get(pk=request.user.pk)
+        try:
+            shelter = Shelter.objects.get(user=user).id
+        except:
+            return Response({
+                "response": "error",
+                "message": "보호소 담당자가 아닙니다."
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        request.data['shelter'] = shelter
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

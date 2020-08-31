@@ -21,7 +21,7 @@ class Post(models.Model):
     on_going = models.BooleanField("봉사모집 상태", default=True)
 
     def __str__(self):
-        return "[%s] %s" % (self.created_at, self.shelter)
+        return "[%s] %s 봉사모집" % (self.created_at, self.shelter)
     class Meta:
         ordering = ('-created_at',)
 

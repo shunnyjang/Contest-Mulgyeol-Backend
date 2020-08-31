@@ -15,11 +15,13 @@ def date_upload_to(instance, filename):
 
 class Post(models.Model):
     shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now=True)
-    image = models.ImageField(upload_to=date_upload_to)
-    information = models.TextField(blank=True)
-    on_going = models.BooleanField(default=True)
+    created_at = models.DateTimeField("업로드 날짜", auto_now=True)
+    image = models.ImageField("첨부 이미지", upload_to=date_upload_to, null=True)
+    information = models.TextField("봉사 설명", blank=True)
+    on_going = models.BooleanField("봉사모집 상태", default=True)
 
+    def __str__(self):
+        return "[%s] %s" % (self.created_at, self.shelter)
     class Meta:
         ordering = ('-created_at',)
 

@@ -12,7 +12,26 @@ from django.utils.timezone import now
 from datetime import timedelta
 
 from django.http import Http404
+from django.contrib.auth import get_user_model
 
+class LoginTestView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            User = get_user_model()
+            user = User.objects.get(pk=request.user.pk)
+
+            if user:
+                return Response({
+                    "response": "success"
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "response": "error"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({
+                    "response": "error"
+                }, status=status.HTTP_400_BAD_REQUEST)
 class UserCreateView(APIView):
     permission_classes = [AllowAny]
 

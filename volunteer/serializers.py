@@ -30,11 +30,18 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class UserVolunteerSerializer(serializers.ModelSerializer):
-    
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['user'] = UserSerializer(instance.user).data
+        response['volunteer'] = VolunteerSerializer(instance.volunteer).data
+        return response
+
     class Meta:
         model = UserVolunteer
         fields = [
             'id',
+            'applied_at',
             'user',
             'volunteer'
         ]

@@ -4,5 +4,6 @@ from . import views
 urlpatterns = [
     path('', views.PostView.as_view(), name='post'),
     path('<int:pk>/', views.PostDetailView.as_view(), name='post_detail'),
-    path('apply/', views.VolunteerView.as_view(), name='volunteer')
+    path('status/', views.VolunteerRetrieveView.as_view(), name='volunteer-status'),
+    path('apply/', views.VolunteerApplyView.as_view(), name='volunteer-apply'),
 ]

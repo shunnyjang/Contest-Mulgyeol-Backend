@@ -39,9 +39,20 @@ class Volunteer(models.Model):
     limit_of_volunteer = models.PositiveIntegerField(default=9)
     num_of_volunteer = models.PositiveIntegerField(default=0)
 
+    def __str__(self):
+        return "[%s] %s" % (self.date, self.shelter.shelter_name)
+
     class Meta:
         ordering = ('-date',)
 
 class UserVolunteer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE)
+    applied_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "%s - %s" % (self.user.name, self.volunteer)
+
+    class Meta:
+        unique_together = ['user', 'volunteer']
+        ordering = ['-applied_at']

@@ -6,7 +6,7 @@ User = get_user_model()
 
 class UserSerializer(serializers.Serializer):
     userID = serializers.CharField(required=True)
-    password = serializers.CharField(required=True)
+    #password = serializers.CharField(required=True)
     name = serializers.CharField(required=True)
     phone = serializers.CharField(required=True)
     role = serializers.CharField(required=True)

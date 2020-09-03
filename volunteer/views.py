@@ -28,7 +28,7 @@ class PostView(ListAPIView):
     def post(self, request, format=None):
         User = get_user_model()
         user = User.objects.get(pk=request.user.pk)
-        
+    
         # multipart/form-parser은 QueryDict이므로 immutable 함
         # 따라서 일시적으로 mutable하게 해줌
         request.data._mutable = True
@@ -48,6 +48,18 @@ class PostView(ListAPIView):
                     tag = tag.strip()
                     tag_, created = Tag.objects.get_or_create(name=tag)
                     serializer.instance.tag.add(tag_)
+            
+            # Create new volunteer objects
+            days = request.data.get('term').split(',')
+            for day in days:
+                if not day:
+                    continue
+                else:
+                    day = day.strip()
+                    volunteer = Volunteer.objects.get_or_create(
+                        shelter=request.user.shelter,
+                        date=day,
+                        limit_of_volunteer=request.data.get('limit'))
             return Response({ # 포스트 업로드 & 태그 등록 완료
                 "response": "success",
                 "message": "성공적으로 봉사모집을 업로드했습니다."
@@ -95,33 +107,35 @@ class PostDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class VolunteerView(APIView):
+class VolunteerRetrieveView(APIView):
 
     permission_classes = [IsAuthShelter]
 
     def get(self, request, format=None):
-        volunteer = Volunteer.objects.filter(shelter=request.user.shelter.pk)
-        serializer = VolunteerSerializer(volunteer, many=True)
+        volunteer = UserVolunteer.objects.filter(volunteer__shelter=request.user.shelter.pk)
+        serializer = UserVolunteerSerializer(volunteer, many=True)
         return Response(serializer.data)
+
+
+class VolunteerApplyView(APIView):
+
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
         data = request.data
-        volunteer = Volunteer.objects.get(shelter=data['shelter'], date=data['date'])
-        data['num_of_volunteer'] = volunteer.num_ov_volunteer + 1
-        serializer = VolunteerSerializer(data=data)
+        volunteer = Volunteer.objects.get(shelter=data.get('shelter'), date=data.get('date'))
+        data['user'] = request.user.pk
+        data['volunteer'] = volunteer.id
+        serializer = UserVolunteerSerializer(data=data)
 
-        uvSerializer = UserVolunteerSerializer(data={
-            "user": request.user.pk,
-            "volunteer": serializer.data.get('id')
-        })
-
-        if uvSerializer.is_valid():
-            uvSerializer.save()
+        volunteer.num_of_volunteer += 1
+        if volunteer.num_of_volunteer <= volunteer.limit_of_volunteer:
+            volunteer.save()
         else:
             return Response({
                 "response": "error",
-                "message": uvSerializer.errors
-            })
+                "message": "하루 봉사 인원 정원 초과, 관리자에게 직접 문의 바람"
+            }, status=status.HTTP_406_NOT_ACCEPTABLE)
 
         if serializer.is_valid():
             serializer.save()

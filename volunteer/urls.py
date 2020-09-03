@@ -3,5 +3,8 @@ from . import views
 
 urlpatterns = [
     path('', views.PostView.as_view(), name='post'),
-    path('apply/', views.VolunteerView.as_view(), name='volunteer')
+    path('<int:pk>/', views.PostDetailView.as_view(), name='post_detail'),
+    path('status/', views.VolunteerRetrieveView.as_view(), name='volunteer_status'),
+    path('apply/', views.VolunteerApplyView.as_view(), name='volunteer_apply'),
+    path('list/', views.UserVolunteerRetrieveView.as_view(), name='volunteer_list'),
 ]

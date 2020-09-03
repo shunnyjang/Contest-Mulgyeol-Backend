@@ -61,7 +61,7 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     'JWT_ENCODE_HANDELR': 'rest_framework_jwt.utils.jwt_encode_handler',
     'JWT_DECODE_HANDLER': 'rest_framework_jwt.utils.jwt_decode_handler',
-    'JWT_PAYLOAD_HANDLER': 'config.token.jwt_payload_handler',
+    'JWT_PAYLOAD_HANDLER': 'config.token.my_jwt_payload_handler',
     'JWT_PAYLOAD_GET_USER_ID_HANDLER': 'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'rest_framework_jwt.utils.jwt_response_payload_handler',
     
@@ -176,3 +176,9 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'x-requested-with',
 )
+
+# SMS MESSAGING API CALL
+SMS_ACCESS_KEY = get_secret('SMS_API_ACCESS')
+SMS_SECRET_KEY = get_secret('SMS_API_SECRET')
+SMS_SERVICE_ID = get_secret('SMS_SERVICE_ID')
+SMS_FROM_NUMBER = get_secret('SMS_FROM_NUMBER')

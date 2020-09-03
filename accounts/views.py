@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_jwt.views import ObtainJSONWebToken
-
 from accounts.serializers import UserSerializer, ShelterSerializer
 from accounts.models import User, PhoneAuth, Shelter
 
@@ -27,11 +26,12 @@ class LoginTestView(APIView):
             else:
                 return Response({
                     "response": "error"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }, status=status.HTTP_401_UNAUTHORIZED)
         except User.DoesNotExist:
             return Response({
                     "response": "error"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }, status=status.HTTP_401_UNAUTHORIZED)
+                
 class UserCreateView(APIView):
     permission_classes = [AllowAny]
 

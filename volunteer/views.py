@@ -26,7 +26,7 @@ class PostView(APIView):
         user = User.objects.get(pk=request.user.pk)
         try:
             shelter = Shelter.objects.get(user=user).id
-        except:
+        except Shelter.DoesNotExist:
             return Response({
                 "response": "error",
                 "message": "보호소 담당자가 아닙니다."

@@ -4,12 +4,12 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.filters import SearchFilter
 
 from config.permissions import IsAuthShelter, IsAuthShelterOrReadOnly, IsOwnShelterOrReadOnly
 from accounts.models import User, Shelter
 from volunteer.models import Post, Tag, Volunteer, UserVolunteer
 from volunteer.serializers import PostSerializer, VolunteerSerializer, UserVolunteerSerializer
-from volunteer.filters import DynamicSearchFilter
 
 from django.contrib.auth import get_user_model
 from django.http import Http404
@@ -19,7 +19,8 @@ class PostView(ListAPIView):
     permssion_classes = [IsAuthShelterOrReadOnly]
     parser_classes = [FormParser, MultiPartParser]
     serializer_class = PostSerializer
-    filter_backends = [DynamicSearchFilter]
+    filter_backends = [SearchFilter]
+    search_fields = ['tag__name']
 
     def get_queryset(self):
         return Post.objects.all()

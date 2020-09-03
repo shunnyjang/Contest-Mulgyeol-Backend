@@ -68,10 +68,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'userID'
 
-    @property
-    def is_shelter_staff(self):
-        return self.role == '2'
-
     def __str__(self):
         return "[%s] %s" % (self.role, self.userID)
 

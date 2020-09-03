@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from volunteer.models import Post, Tag, Volunteer, UserVolunteer
 from accounts.models import User
-from accounts.serializers import UserSerializer
+from accounts.serializers import UserSerializer, ShelterSerializer
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,6 +13,11 @@ class TagSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['shelter'] = ShelterSerializer(instance.shelter).data
+        return response
     
     class Meta:
         model = Post

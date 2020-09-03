@@ -148,3 +148,13 @@ class VolunteerApplyView(APIView):
                 "response": "error",
                 "message": serializer.errors
             })
+
+
+class UserVolunteerRetrieveView(APIView):
+    
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        my_volunteers = UserVolunteer.objects.filter(user=request.user.pk)
+        serializer = UserVolunteerSerializer(my_volunteers, many=True)
+        return Response(serializer.data)

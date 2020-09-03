@@ -35,6 +35,8 @@ class UserVolunteerSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['user'] = UserSerializer(instance.user).data
         response['volunteer'] = VolunteerSerializer(instance.volunteer).data
+        response['shelter_id'] = instance.volunteer.shelter.id
+        response['shelter_chat'] = instance.volunteer.shelter.chat_url
         return response
 
     class Meta:

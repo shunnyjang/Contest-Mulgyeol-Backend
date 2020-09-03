@@ -1,26 +1,28 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 
-from config.permissions import IsAuthShelter, IsAuthShelterOrReadOnly
+from config.permissions import IsAuthShelter, IsAuthShelterOrReadOnly, IsOwnShelterOrReadOnly
 from accounts.models import User, Shelter
 from volunteer.models import Post, Tag, Volunteer, UserVolunteer
 from volunteer.serializers import PostSerializer, VolunteerSerializer, UserVolunteerSerializer
+from volunteer.filters import DynamicSearchFilter
 
 from django.contrib.auth import get_user_model
 from django.http import Http404
 
-class PostView(APIView):
+class PostView(ListAPIView):
 
-    permission_classes = [IsAuthShelterOrReadOnly]
-    parser_classes = (FormParser, MultiPartParser,)
+    permssion_classes = [IsAuthShelterOrReadOnly]
+    parser_classes = [FormParser, MultiPartParser]
+    serializer_class = PostSerializer
+    filter_backends = [DynamicSearchFilter]
 
-    def get(self, request, format=None):
-        post = Post.objects.all()
-        serializer = PostSerializer(post, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return Post.objects.all()
 
     def post(self, request, format=None):
         User = get_user_model()
@@ -56,24 +58,48 @@ class PostView(APIView):
             })
 
 
+class PostDetailView(APIView):
+    
+    permission_classes = [IsOwnShelterOrReadOnly]
+
+    def get_object(self, pk):
+        try:
+            return Post.objects.get(pk=pk)
+        except:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        post = self.get_object(pk)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+    
+    def patch(self, request, pk, format=None):
+        post = self.get_object(pk)
+        
+        if request.data.get('tags'):
+            tags = post.tag.all()
+            tags.delete()
+            tags = request.data.get('tags').split(',')
+            for tag in tags:
+                if not tag: 
+                    continue
+                else:
+                    tag = tag.strip()
+                    tag_, created = Tag.objects.get_or_create(name=tag)
+                    post.tag.add(tag_)
+
+        serializer = PostSerializer(post, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 class VolunteerView(APIView):
 
     permission_classes = [IsAuthShelter]
 
     def get(self, request, format=None):
-        User = get_user_model()
-        user = User.objects.get(pk=request.user.pk)
-        
-        # request.user의 보호소 찾기
-        try:
-            shelter = Shelter.objects.get(user=user).id
-        except Shelter.DoesNotExist:
-            return Response({
-                "response": "error",
-                "message": "보호소 담당자가 아닙니다."
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        volunteer = Volunteer.objects.filter(shelter=request.data.get('shelter'))
+        volunteer = Volunteer.objects.filter(shelter=request.user.shelter.pk)
         serializer = VolunteerSerializer(volunteer, many=True)
         return Response(serializer.data)
 

@@ -21,7 +21,7 @@ class IsAuthShelterOrReadOnly(BasePermission):
         else:
             return bool(request.user.role == "2" and request.user.is_active)
 
-class OwnShelterPermission(BasePermission):
+class IsOwnShelterOrReadOnly(BasePermission):
     """
     Object-level permission to only allow updating his own profile
     """

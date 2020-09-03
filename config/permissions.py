@@ -21,3 +21,15 @@ class IsAuthShelterOrReadOnly(BasePermission):
         else:
             return bool(request.user.role == "2" and request.user.is_active)
 
+class OwnShelterPermission(BasePermission):
+    """
+    Object-level permission to only allow updating his own profile
+    """
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method in SAFE_METHODS or request.user.role == "1":
+            return True
+
+        # obj here is a UserProfile instance
+        return obj.shelter == request.user.shelter

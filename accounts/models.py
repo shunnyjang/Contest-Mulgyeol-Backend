@@ -73,7 +73,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Shelter(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='shelter')
     shelter_name = models.CharField("보호소 이름", max_length=20)
     loc_short = models.CharField("간단한 주소", max_length=15, default="서울특별시 종로구")
     loc_detail = models.CharField("상세 주소", max_length=50, blank=True)

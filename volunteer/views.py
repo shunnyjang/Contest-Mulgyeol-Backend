@@ -10,6 +10,7 @@ from volunteer.models import Post, Tag, Volunteer, UserVolunteer
 from volunteer.serializers import PostSerializer, VolunteerSerializer, UserVolunteerSerializer
 
 from django.contrib.auth import get_user_model
+from django.http import Http404
 
 class PostView(APIView):
 
@@ -25,19 +26,10 @@ class PostView(APIView):
         User = get_user_model()
         user = User.objects.get(pk=request.user.pk)
         
-        # request.user의 보호소 찾기
-        try:
-            shelter = Shelter.objects.get(user=user).id
-        except Shelter.DoesNotExist:
-            return Response({
-                "response": "error",
-                "message": "보호소 담당자가 아닙니다."
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
         # multipart/form-parser은 QueryDict이므로 immutable 함
         # 따라서 일시적으로 mutable하게 해줌
         request.data._mutable = True
-        request.data['shelter'] = shelter
+        request.data['shelter'] = request.user.shelter.pk
         request.data._mutable = False
 
         # Create a new post object

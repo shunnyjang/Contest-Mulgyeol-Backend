@@ -7,16 +7,15 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = [
-            'id',
-            'tag'
+            'name'
         ]
 
 class PostSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True, read_only=True)
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['shelter'] = ShelterSerializer(instance.shelter).data
+        response['tags'] = TagSerializer(instance.tag, many=True, read_only=True).data
         return response
     
     class Meta:
@@ -26,8 +25,6 @@ class PostSerializer(serializers.ModelSerializer):
             'created_at',
             'image',
             'information',
-            'on_going',
-            'tags'
         ]
 
 

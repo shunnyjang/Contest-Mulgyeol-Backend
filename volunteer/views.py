@@ -13,7 +13,6 @@ from django.contrib.auth import get_user_model
 class PostView(APIView):
 
     permission_classes = [AllowAny]
-    #IsAuthenticatedOrReadOnly,
     parser_classes = (FormParser, MultiPartParser,)
 
     def get(self, request, format=None):
@@ -24,6 +23,8 @@ class PostView(APIView):
     def post(self, request, format=None):
         User = get_user_model()
         user = User.objects.get(pk=request.user.pk)
+        
+        # request.user의 보호소 찾기
         try:
             shelter = Shelter.objects.get(user=user).id
         except Shelter.DoesNotExist:
@@ -31,12 +32,27 @@ class PostView(APIView):
                 "response": "error",
                 "message": "보호소 담당자가 아닙니다."
             }, status=status.HTTP_400_BAD_REQUEST)
-            
+        
+        # multipart/form-parser은 QueryDict이므로 immutable 함
+        # 따라서 일시적으로 mutable하게 해줌
+        request.data._mutable = True
         request.data['shelter'] = shelter
+        request.data._mutable = False
+
+        # Create a new post object
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response({
+            serializer.save() # 봉사 모집 포스트 업로드 완료
+            # Create new tag objects
+            tags = request.data.get('tags').split(',')
+            for tag in tags:
+                if not tag: 
+                    continue
+                else:
+                    tag = tag.strip()
+                    tag_, created = Tag.objects.get_or_create(name=tag)
+                    serializer.instance.tag.add(tag_)
+            return Response({ # 포스트 업로드 & 태그 등록 완료
                 "response": "success",
                 "message": "성공적으로 봉사모집을 업로드했습니다."
             })

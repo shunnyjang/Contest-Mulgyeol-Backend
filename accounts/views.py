@@ -2,7 +2,7 @@ from django.contrib.auth.models import update_last_login
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_jwt.views import ObtainJSONWebToken
 from accounts.serializers import UserSerializer, ShelterSerializer
 from accounts.models import User, PhoneAuth, Shelter
@@ -14,24 +14,12 @@ from django.http import Http404
 from django.contrib.auth import get_user_model
 
 class LoginTestView(APIView):
-    def get(self, request, *args, **kwargs):
-        try:
-            User = get_user_model()
-            user = User.objects.get(pk=request.user.pk)
+    permission_classes = [IsAuthenticated]
 
-            if user:
-                return Response({
-                    "response": "success"
-                }, status=status.HTTP_200_OK)
-            else:
-                return Response({
-                    "response": "error"
-                }, status=status.HTTP_401_UNAUTHORIZED)
-        except User.DoesNotExist:
-            return Response({
-                    "response": "error"
-                }, status=status.HTTP_401_UNAUTHORIZED)
-                
+    def get(self, request, *args, **kwargs):
+        return Response({"response": "login success"}, status=status.HTTP_200_OK)
+
+
 class UserCreateView(APIView):
     permission_classes = [AllowAny]
 

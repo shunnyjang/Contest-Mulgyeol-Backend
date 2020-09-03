@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 
+from config.permissions import IsAuthShelter, IsAuthShelterOrReadOnly
 from accounts.models import User, Shelter
 from volunteer.models import Post, Tag, Volunteer, UserVolunteer
 from volunteer.serializers import PostSerializer, VolunteerSerializer, UserVolunteerSerializer
@@ -12,7 +13,7 @@ from django.contrib.auth import get_user_model
 
 class PostView(APIView):
 
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthShelterOrReadOnly]
     parser_classes = (FormParser, MultiPartParser,)
 
     def get(self, request, format=None):
@@ -55,19 +56,31 @@ class PostView(APIView):
             return Response({ # 포스트 업로드 & 태그 등록 완료
                 "response": "success",
                 "message": "성공적으로 봉사모집을 업로드했습니다."
-            })
+            }, status=status.HTTP_201_CREATED)
         else:
             return Response({
                 "response": "error",
                 "message": serializer.errors
             })
 
+
 class VolunteerView(APIView):
 
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    #IsAuthenticated, 
+    permission_classes = [IsAuthShelter]
 
     def get(self, request, format=None):
+        User = get_user_model()
+        user = User.objects.get(pk=request.user.pk)
+        
+        # request.user의 보호소 찾기
+        try:
+            shelter = Shelter.objects.get(user=user).id
+        except Shelter.DoesNotExist:
+            return Response({
+                "response": "error",
+                "message": "보호소 담당자가 아닙니다."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         volunteer = Volunteer.objects.filter(shelter=request.data.get('shelter'))
         serializer = VolunteerSerializer(volunteer, many=True)
         return Response(serializer.data)

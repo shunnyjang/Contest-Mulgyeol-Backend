@@ -10,6 +10,7 @@ import hashlib
 import hmac
 import base64
 import json
+from config.settings.base import SMS_ACCESS_KEY, SMS_SECRET_KEY, SMS_SERVICE_ID, SMS_FROM_NUMBER
 
 # thumbnail
 import os
@@ -108,7 +109,7 @@ class PhoneAuth(TimeStampedModel):
     
     def	make_signature(self, access_key, secret_key, timestamp):
         method = "POST"
-        uri = "/sms/v2/services/ncp:sms:kr:260402630832:mulgyeol/messages"
+        uri = "/sms/v2/services/%s/messages" % (SMS_SERVICE_ID)
 
         message = method + " " + uri + "\n" + timestamp + "\n" + access_key
         message = bytes(message, 'UTF-8')
@@ -117,15 +118,15 @@ class PhoneAuth(TimeStampedModel):
     
     def send_sms(self):
         timestamp = str(int(time.time() * 1000))
-        access_key = "aoGKSOsk1tlxnTY0xMZN"
-        secret_key = "eZSrVmLF8EKLPe9Pbp7WC4QD5umMTfw1RsrOl2Bb"
+        access_key = SMS_ACCESS_KEY
+        secret_key = SMS_SECRET_KEY
         secret_key = bytes(secret_key, 'UTF-8')
         signature = self.make_signature(access_key, secret_key, timestamp)
 
-        url = "https://sens.apigw.ntruss.com/sms/v2/services/ncp:sms:kr:260402630832:mulgyeol/messages"
+        url = "https://sens.apigw.ntruss.com/sms/v2/services/%s/messages" % (SMS_SERVICE_ID)
         content = {
             "type": "SMS",
-            "from": "01095888705",
+            "from": SMS_FROM_NUMBER,
             "content": "[테스트] 인증 번호 [%d]를 입력해주세요." % (self.auth_number),
             "messages":[
                 {

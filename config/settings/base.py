@@ -176,3 +176,9 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'x-requested-with',
 )
+
+# SMS MESSAGING API CALL
+SMS_ACCESS_KEY = get_secret('SMS_API_ACCESS')
+SMS_SECRET_KEY = get_secret('SMS_API_SECRET')
+SMS_SERVICE_ID = get_secret('SMS_SERVICE_ID')
+SMS_FROM_NUMBER = get_secret('SMS_FROM_NUMBER')

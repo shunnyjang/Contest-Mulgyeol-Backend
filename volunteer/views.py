@@ -16,7 +16,7 @@ from django.http import Http404
 
 class PostView(ListAPIView):
 
-    permssion_classes = [IsAuthShelterOrReadOnly]
+    permission_classes = [IsAuthShelterOrReadOnly]
     parser_classes = [FormParser, MultiPartParser]
     serializer_class = PostSerializer
     filter_backends = [SearchFilter]

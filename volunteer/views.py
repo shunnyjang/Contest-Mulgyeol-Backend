@@ -133,7 +133,7 @@ class VolunteerApplyView(APIView):
         today = date.today()
         month_later = today + timedelta(days=30)
 
-        calandar = Volunteer.objects.filter(shelter=request.query_params['shelter'], date__lt=month_later)
+        calandar = Volunteer.objects.filter(shelter=request.query_params['shelter'], date__gt=today, date__lt=month_later)
         serializer = VolunteerSerializer(calandar, many=True)
         return Response(serializer.data)
 

@@ -131,10 +131,9 @@ class VolunteerApplyView(APIView):
         봉사 가능 날짜 확인
         """
         today = date.today()
-        month_ago = today - timedelta(days=30)
         month_later = today + timedelta(days=30)
 
-        calandar = Volunteer.objects.filter(shelter=request.query_params['shelter'], date__gt=month_ago, date__lt=month_later)
+        calandar = Volunteer.objects.filter(shelter=request.query_params['shelter'], date__lt=month_later)
         serializer = VolunteerSerializer(calandar, many=True)
         return Response(serializer.data)
 

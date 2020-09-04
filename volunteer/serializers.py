@@ -14,7 +14,6 @@ class PostSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        # response['shelter'] = ShelterSerializer(instance.shelter).data
         response['shelter_name'] = instance.shelter.shelter_name
         response['shelter_location'] = instance.shelter.loc_short
         response['shelter_status'] = instance.shelter.status

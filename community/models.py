@@ -16,7 +16,7 @@ def date_upload_to(instance, filename):
 class Community(models.Model):
     shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
-    image = models.ImageField(upload_to=date_upload_to)
+    image = models.ImageField(blank=True, upload_to=date_upload_to)
     content = models.TextField(blank=True)
 
 class Charity(models.Model):

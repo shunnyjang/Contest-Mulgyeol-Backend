@@ -19,7 +19,7 @@ class IsAuthShelterOrReadOnly(BasePermission):
         if request.user.is_anonymous:
             return bool(request.method in SAFE_METHODS)
         else:
-            return bool(request.user.role == "2" and request.user.is_active)
+            return bool(request.method in SAFE_METHODS or request.user.role == "2" and request.user.is_active)
 
 class IsOwnShelterOrReadOnly(BasePermission):
     """

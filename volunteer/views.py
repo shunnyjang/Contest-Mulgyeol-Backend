@@ -18,7 +18,7 @@ from datetime import date, timedelta
 
 class PostView(ListAPIView):
 
-    permission_classes = [IsAuthShelterOrReadOnly]
+    permission_classes = [AllowAny]
     parser_classes = [FormParser, MultiPartParser]
     serializer_class = PostSerializer
     filter_backends = [SearchFilter]
@@ -26,6 +26,11 @@ class PostView(ListAPIView):
 
     def get_queryset(self):
         return Post.objects.all()
+
+
+class PostCreateView(APIView):
+
+    permission_classes = [IsAuthShelter]
 
     def post(self, request, format=None):
         User = get_user_model()

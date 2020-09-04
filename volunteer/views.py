@@ -14,6 +14,8 @@ from volunteer.serializers import PostSerializer, VolunteerSerializer, UserVolun
 from django.contrib.auth import get_user_model
 from django.http import Http404
 
+from datetime import date, timedelta
+
 class PostView(ListAPIView):
 
     permission_classes = [IsAuthShelterOrReadOnly]
@@ -112,6 +114,9 @@ class VolunteerRetrieveView(APIView):
     permission_classes = [IsAuthShelter]
 
     def get(self, request, format=None):
+        """
+        봉사신청 현황 (보호소)
+        """
         volunteer = UserVolunteer.objects.filter(volunteer__shelter=request.user.shelter.pk)
         serializer = UserVolunteerSerializer(volunteer, many=True)
         return Response(serializer.data)
@@ -121,7 +126,22 @@ class VolunteerApplyView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    def get(self, request, format=None):
+        """
+        봉사 가능 날짜 확인
+        """
+        today = date.today()
+        month_ago = today - timedelta(days=30)
+        month_later = today + timedelta(days=30)
+
+        calandar = Volunteer.objects.filter(shelter=request.query_params['shelter'], date__gt=month_ago, date__lt=month_later)
+        serializer = VolunteerSerializer(calandar, many=True)
+        return Response(serializer.data)
+
     def post(self, request, format=None):
+        """
+        봉사 신청
+        """
         data = request.data
         volunteer = Volunteer.objects.get(shelter=data.get('shelter'), date=data.get('date'))
         data['user'] = request.user.pk
@@ -155,6 +175,9 @@ class UserVolunteerRetrieveView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        """
+        봉사신청 내역 (봉사자)
+        """
         my_volunteers = UserVolunteer.objects.filter(user=request.user.pk)
         serializer = UserVolunteerSerializer(my_volunteers, many=True)
         return Response(serializer.data)

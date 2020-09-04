@@ -4,8 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_jwt.views import ObtainJSONWebToken
+
 from accounts.serializers import UserSerializer, ShelterSerializer
 from accounts.models import User, PhoneAuth, Shelter
+from config.permissions import IsAuthShelterOrReadOnly, IsOwnShelterOrReadOnly
 
 from django.utils.timezone import now
 from datetime import timedelta
@@ -75,6 +77,9 @@ class ShelterCreateView(APIView):
 
 
 class ShelterDetailView(APIView):
+
+    permssion_classes = [IsOwnShelterOrReadOnly]
+
     def get_object(self, pk):
         try:
             return Shelter.objects.get(pk=pk)
@@ -88,7 +93,11 @@ class ShelterDetailView(APIView):
             
     
     def patch(self, request, pk, format=None):
-        shelter = self.get_object(pk)
+        try:
+            shelter = Shelter.objects.get(id=request.user.shelter.id)
+        except:
+            raise Http404
+        
         serializer = ShelterSerializer(shelter, data=request.data, partial=True)
 
         if serializer.is_valid():

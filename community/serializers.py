@@ -1,6 +1,22 @@
 from rest_framework import serializers
 from community.models import Community, Charity, CharityImage
 
+class CommunitySerializer(serializers.ModelSerializer):
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['shelter_name'] = instance.shelter.shelter_name
+        return response
+
+    class Meta:
+        model = Community
+        fields = [
+            'id',
+            'shelter',
+            'created_at',
+            'image',
+            'content'
+        ]
 
 class CharityImageImageSerializer(serializers.ModelSerializer):
     class Meta:

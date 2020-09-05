@@ -57,8 +57,8 @@ class ShelterCreateView(APIView):
         user = UserSerializer(data=request.data.get('profile'))
         shelter = ShelterSerializer(data=request.data.get('shelter'))
         if user.is_valid():
-            user.save()
             if shelter.is_valid():
+                user.save()
                 shelter.save()
                 return Response({
                     "response": "success",

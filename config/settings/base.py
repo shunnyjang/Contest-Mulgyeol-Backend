@@ -67,7 +67,7 @@ JWT_AUTH = {
     
     'JWT_ALLOW_REFRESH': True,
     'JWT_EXPIRATION_DELTA': timedelta(days=30),
-    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7)
+    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=60)
 }
 
 AUTH_USER_MODEL = 'accounts.User'

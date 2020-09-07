@@ -50,18 +50,7 @@ class PostView(ListAPIView):
                     tag = tag.strip()
                     tag_, created = Tag.objects.get_or_create(name=tag)
                     serializer.instance.tag.add(tag_)
-            
-            # Create new volunteer objects
-            days = request.data.get('term').split(',')
-            for day in days:
-                if not day:
-                    continue
-                else:
-                    day = day.strip()
-                    volunteer = Volunteer.objects.get_or_create(
-                        shelter=request.user.shelter,
-                        date=day,
-                        limit_of_volunteer=request.data.get('limit'))
+
             return Response({ # 포스트 업로드 & 태그 등록 완료
                 "response": "success",
                 "message": "성공적으로 봉사모집을 업로드했습니다."

@@ -15,6 +15,7 @@ from django.contrib.auth import get_user_model
 from django.http import Http404
 
 from datetime import date, timedelta
+import calendar
 
 class PostView(ListAPIView):
 
@@ -80,6 +81,7 @@ class PostDetailView(APIView):
     def patch(self, request, pk, format=None):
         post = self.get_object(pk)
         
+        # 태그 수정시 모두 삭제하고 재등록
         if request.data.get('tags'):
             tags = post.tag.all()
             tags.delete()
@@ -98,31 +100,19 @@ class PostDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class VolunteerRetrieveView(APIView):
-
-    permission_classes = [IsAuthShelter]
-
-    def get(self, request, format=None):
-        """
-        봉사신청 현황 (보호소)
-        """
-        volunteer = UserVolunteer.objects.filter(volunteer__shelter=request.user.shelter.pk)
-        serializer = UserVolunteerSerializer(volunteer, many=True)
-        return Response(serializer.data)
-
-
 class VolunteerApplyView(APIView):
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         """
-        봉사 가능 날짜 확인
+        봉사 가능 날짜 확인 (이번 달)
         """
         today = date.today()
-        month_later = today + timedelta(days=30)
+        last_day_of_the_month = calendar.monthrange(today.year, today.month)[1]
+        last_day_of_the_month = date(today.year, today.month, last_day_of_the_month)
 
-        calandar = Volunteer.objects.filter(shelter=request.query_params['shelter'], date__gt=today, date__lt=month_later)
+        calandar = Volunteer.objects.filter(shelter=request.query_params['shelter'], date__gt=today, date__lte=last_day_of_the_month)
         serializer = VolunteerSerializer(calandar, many=True)
         return Response(serializer.data)
 
@@ -168,4 +158,17 @@ class UserVolunteerRetrieveView(APIView):
         """
         my_volunteers = UserVolunteer.objects.filter(user=request.user.pk)
         serializer = UserVolunteerSerializer(my_volunteers, many=True)
+        return Response(serializer.data)
+
+
+class VolunteerRetrieveView(APIView):
+
+    permission_classes = [IsAuthShelter]
+
+    def get(self, request, format=None):
+        """
+        봉사신청 현황 (보호소)
+        """
+        volunteer = UserVolunteer.objects.filter(volunteer__shelter=request.user.shelter.pk)
+        serializer = UserVolunteerSerializer(volunteer, many=True)
         return Response(serializer.data)

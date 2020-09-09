@@ -25,6 +25,12 @@ def date_upload_to(instance, filename):
     return '/'.join([ymd_path, uuid_name + extension, ])
 
 
+def thumbnail_upload_to(instance, filename):
+    shelter = instance.shelter_name
+    extension = os.path.splitext(filename)[-1].lower()
+    return "%s.%s" % (shelter, extension)
+
+
 class UserManager(BaseUserManager):
     user_in_migrations = True
 
@@ -77,22 +83,21 @@ class Shelter(models.Model):
     shelter_name = models.CharField("보호소 이름", max_length=20)
     loc_short = models.CharField("간단한 주소", max_length=15, default="서울특별시 종로구")
     loc_detail = models.CharField("상세 주소", max_length=50, blank=True)
+    image = models.ImageField("첨부 이미지", upload_to=thumbnail_upload_to, null=True)
     url = models.CharField("보호소 홍보 SNS URL", max_length=200, blank=True)
     chat_url = models.CharField("보호소 오픈채팅 URL", max_length=200, blank=True)
     status = models.CharField("동물 보호 현황", max_length=100, null=False, default="개 0마리")
+    limit_of_volunteer = models.PositiveIntegerField(default=9)
     content = models.TextField("보호소 소개", blank=True)
     caution = models.TextField("봉사 주의사항", blank=True)
 
     def __str__(self):
-        return "[%s] %s" % (self.loc_short, self.shelter_name)
+        return "(%d)[%s] %s" % (self.id, self.loc_short, self.shelter_name)
     
     @property
     def is_shelter_staff(self):
         return self.user.role == '2'
 
-class ShelterThumbnail(models.Model):
-    shelter = models.OneToOneField(Shelter, on_delete=models.CASCADE)
-    thumbnail = models.ImageField(null=True, upload_to=date_upload_to)
 
 class PhoneAuth(TimeStampedModel):
     phone_number = models.CharField(verbose_name='휴대폰 번호', primary_key=True, max_length=11)

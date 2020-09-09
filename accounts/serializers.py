@@ -43,9 +43,11 @@ class ShelterSerializer(serializers.ModelSerializer):
             'shelter_name',
             'loc_short',
             'loc_detail',
+            'image',
             'url',
             'chat_url',
             'status',
+            'limit_of_volunteer',
             'content',
             'caution'
         ]

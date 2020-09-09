@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework_jwt.views import ObtainJSONWebToken
 
 from accounts.serializers import UserSerializer, ShelterSerializer
@@ -79,6 +80,7 @@ class ShelterCreateView(APIView):
 class ShelterDetailView(APIView):
 
     permssion_classes = [IsOwnShelterOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_object(self, pk):
         try:

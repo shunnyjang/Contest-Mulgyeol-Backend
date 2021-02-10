@@ -60,7 +60,7 @@ class VolunteerApplyView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view('GET')
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_of_applying_volunteer_of_user(request):
     user = get_user_model().objects.get(pk=request.user.pk)
@@ -69,7 +69,7 @@ def list_of_applying_volunteer_of_user(request):
     return Response(volunteer_serializer.data)
 
 
-@api_view('GET')
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_of_volunteer_for_shelter(request):
     user = get_user_model().objects.get(pk=request.user.pk)

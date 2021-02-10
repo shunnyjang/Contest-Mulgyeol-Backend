@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.timezone import now
+
 from accounts.models import Shelter, User
 
 #image
@@ -39,7 +41,7 @@ class Recruitment(models.Model):
 
 class DailyRecruitmentStatus(models.Model):
     shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE)
-    date = models.DateField(null=False, blank=False, default=date.today())
+    date = models.DateField(null=False, blank=False, default=now())
     need_number = models.PositiveIntegerField(default=9, verbose_name="필요한 인원")
     current_number = models.PositiveIntegerField(default=0, verbose_name="현재 인원")
     applicant = models.ManyToManyField(User)
@@ -54,5 +56,5 @@ class Volunteer(models.Model):
         return "%s - %s" % (self.user.name, self.applying_for)
 
     class Meta:
-        unique_together = ['volunteer', 'applying_for']
+        unique_together = ['user', 'applying_for']
         ordering = ['-applied_at']

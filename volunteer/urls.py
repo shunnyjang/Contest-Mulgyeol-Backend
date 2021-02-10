@@ -1,5 +1,4 @@
 from django.urls import path
-from . import views
 from .APIs import applyment, recruitment
 
 urlpatterns = [

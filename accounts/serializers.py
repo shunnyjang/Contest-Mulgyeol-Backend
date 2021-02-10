@@ -1,10 +1,10 @@
-from django.contrib.auth import get_user_model, authenticate
+from abc import ABC
+
 from rest_framework import serializers
 from accounts.models import User, Shelter
 
-User = get_user_model()
 
-class UserSerializer(serializers.Serializer):
+class UserSerializer(serializers.Serializer, ABC):
     userID = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
     name = serializers.CharField(required=True)
@@ -12,14 +12,7 @@ class UserSerializer(serializers.Serializer):
     role = serializers.CharField(required=True)
 
     class Meta:
-        fields = [
-            'id',
-            'userID',
-            'password',
-            'name',
-            'phone',
-            'role'
-        ]
+        fields = '__all__'
 
     def create(self, validated_data):
         user = User.objects.create(
@@ -31,23 +24,11 @@ class UserSerializer(serializers.Serializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
-        
+
+
 class ShelterSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='userID')
 
     class Meta:
         model = Shelter
-        fields = [
-            'id',
-            'user',
-            'shelter_name',
-            'loc_short',
-            'loc_detail',
-            'thumbnail',
-            'url',
-            'chat_url',
-            'status',
-            'limit_of_volunteer',
-            'content',
-            'caution'
-        ]
+        fields = '__all__'

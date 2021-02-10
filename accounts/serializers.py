@@ -1,10 +1,8 @@
-from abc import ABC
-
 from rest_framework import serializers
 from accounts.models import User, Shelter
 
 
-class UserSerializer(serializers.Serializer, ABC):
+class UserSerializer(serializers.Serializer):
     userID = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
     name = serializers.CharField(required=True)

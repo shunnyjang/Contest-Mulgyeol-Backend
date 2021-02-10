@@ -1,6 +1,3 @@
-from django.db import models
-from django.utils.timezone import now
-
 from accounts.models import Shelter, User
 
 #image
@@ -8,7 +5,6 @@ import os
 from uuid import uuid4
 from django.db import models
 from django.utils import timezone
-from datetime import date
 
 
 def date_upload_to(filename):
@@ -41,7 +37,7 @@ class Recruitment(models.Model):
 
 class DailyRecruitmentStatus(models.Model):
     shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE)
-    date = models.DateField(null=False, blank=False, default=now())
+    date = models.DateField(null=False, blank=False, default=timezone.now)
     need_number = models.PositiveIntegerField(default=9, verbose_name="필요한 인원")
     current_number = models.PositiveIntegerField(default=0, verbose_name="현재 인원")
     applicant = models.ManyToManyField(User)

@@ -6,26 +6,29 @@ import os
 from uuid import uuid4
 from django.db import models
 from django.utils import timezone
+from datetime import date
 
-def date_upload_to(instance, filename):
+
+def date_upload_to(filename):
     ymd_path = timezone.now().strftime('%Y/%m/%d')
     uuid_name = uuid4().hex
     extension = os.path.splitext(filename)[-1].lower()
     return '/'.join([ymd_path, uuid_name + extension, ])
 
+
 class Tag(models.Model):
-    name = models.CharField(max_length=32, null=True, verbose_name="태그명")
-    registered_date = models.DateTimeField(auto_now_add=True, verbose_name="등록시간")
+    text = models.CharField(max_length=32, null=True, verbose_name="태그명")
 
     def __str__(self):
-        return self.name
+        return self.text
 
-class Post(models.Model):
+
+class Recruitment(models.Model):
     shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE)
     created_at = models.DateTimeField("업로드 날짜", auto_now=True)
     image = models.ImageField("첨부 이미지", upload_to=date_upload_to, null=True)
     information = models.TextField("봉사 설명", blank=True)
-    tag = models.ManyToManyField(Tag, verbose_name = "태그")
+    tags = models.ManyToManyField(Tag, verbose_name="태그")
 
     def __str__(self):
         return "[%s] %s 봉사모집" % (self.created_at, self.shelter)
@@ -33,26 +36,23 @@ class Post(models.Model):
     class Meta:
         ordering = ('-created_at',)
 
-class Volunteer(models.Model):
+
+class DailyRecruitmentStatus(models.Model):
     shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE)
-    date = models.DateField()
-    limit_of_volunteer = models.PositiveIntegerField(default=9)
-    num_of_volunteer = models.PositiveIntegerField(default=0)
+    date = models.DateField(null=False, blank=False, default=date.today())
+    need_number = models.PositiveIntegerField(default=9, verbose_name="필요한 인원")
+    current_number = models.PositiveIntegerField(default=0, verbose_name="현재 인원")
+    applicant = models.ManyToManyField(User)
 
-    def __str__(self):
-        return "[%s] %s" % (self.date, self.shelter.shelter_name)
 
-    class Meta:
-        ordering = ('-date',)
-
-class UserVolunteer(models.Model):
+class Volunteer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE)
+    applying_for = models.ForeignKey(DailyRecruitmentStatus, on_delete=models.CASCADE)
     applied_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "%s - %s" % (self.user.name, self.volunteer)
+        return "%s - %s" % (self.user.name, self.applying_for)
 
     class Meta:
-        unique_together = ['user', 'volunteer']
+        unique_together = ['volunteer', 'applying_for']
         ordering = ['-applied_at']

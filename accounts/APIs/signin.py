@@ -1,10 +1,12 @@
 from django.contrib.auth.models import update_last_login
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_jwt.views import ObtainJSONWebToken
 
+from accounts.APIs.serializer_for_schema import SignInRequestSerializer, SignInResponseSerializer
 from accounts.models import User
 
 
@@ -16,6 +18,11 @@ class LoginTestView(APIView):
 
 
 class LoginJWTView(ObtainJSONWebToken):
+    @extend_schema(
+        request=SignInRequestSerializer,
+        responses={200: SignInResponseSerializer,
+                   400: None}
+    )
     def post(self, request, *args, **kwargs):
         response = super().post(request, content_type='application/json')
 

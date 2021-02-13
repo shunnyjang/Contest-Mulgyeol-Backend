@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounts.models import User, Shelter
+from accounts.models import User, Shelter, PhoneAuth
 
 
 class UserSerializer(serializers.Serializer):
@@ -30,3 +30,15 @@ class ShelterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shelter
         fields = '__all__'
+
+
+class PhoneAuthSerializer(serializers.ModelSerializer):
+    phone_number = serializers.CharField(required=True)
+    auth_number = serializers.IntegerField(required=False, read_only=True)
+
+    class Meta:
+        model = PhoneAuth
+        fields = [
+            'phone_number',
+            'auth_number'
+        ]

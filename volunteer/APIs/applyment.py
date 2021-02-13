@@ -2,6 +2,7 @@ from calendar import calendar
 from datetime import date
 
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import Shelter
+from volunteer.APIs.serializer_for_schema import VolunteerApplyReqeustSeriazlier
 from volunteer.models import DailyRecruitmentStatus, Volunteer
 from volunteer.serializers import DailyRecruitmentStatusSerializer, VolunteerSerializer
 
@@ -16,6 +18,9 @@ from volunteer.serializers import DailyRecruitmentStatusSerializer, VolunteerSer
 class VolunteerApplyView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        responses=DailyRecruitmentStatusSerializer
+    )
     def get(self, request, format=None):
         """
         봉사 가능 날짜 확인 (이번 달)
@@ -29,6 +34,11 @@ class VolunteerApplyView(APIView):
         recruitment_status_serializer = DailyRecruitmentStatusSerializer(volunteer_recruitment_calendar, many=True)
         return Response(recruitment_status_serializer.data)
 
+    @extend_schema(
+        request=VolunteerApplyReqeustSeriazlier,
+        responses={201: None,
+                   400: None}
+    )
     def post(self, request, format=None):
         """
         봉사 신청
@@ -53,13 +63,17 @@ class VolunteerApplyView(APIView):
             return Response({
                 "response": "success",
                 "message": "봉사신청이 완료되었습니다."
-            })
+            }, status=status.HTTP_201_CREATED)
         return Response({
             "response": "error",
             "message": volunteer_serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    description="사용자가 자신의 봉사신청 내역을 확인할 수 있는 API입니다.",
+    responses=VolunteerSerializer
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_of_applying_volunteer_of_user(request):
@@ -69,6 +83,10 @@ def list_of_applying_volunteer_of_user(request):
     return Response(volunteer_serializer.data)
 
 
+@extend_schema(
+    description="보호소가 봉사신청한 봉사자 목록을 확인할 수 있는 API입니다.",
+    responses=VolunteerSerializer
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_of_volunteer_for_shelter(request):

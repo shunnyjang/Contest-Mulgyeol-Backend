@@ -1,18 +1,25 @@
 from datetime import timedelta
 
 from django.utils.timezone import now
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_jwt.serializers import User
 
+from accounts.APIs.serializer_for_schema import CheckIdRequestSerializer
 from accounts.models import PhoneAuth
-from accounts.serializers import UserSerializer, User
+from accounts.serializers import UserSerializer, PhoneAuthSerializer
 
 
 class UserCreateView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=UserSerializer,
+        responses={201: UserSerializer},
+    )
     def post(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -28,6 +35,11 @@ class UserCreateView(APIView):
 
 
 class CheckIdView(APIView):
+    @extend_schema(
+        parameters=[CheckIdRequestSerializer],
+        responses={200: None,
+                   400: None}
+    )
     def get(self, request, format=None):
         try:
             user_input_id = request.query_params['id']
@@ -54,6 +66,11 @@ def check_auth_number(p_num, c_num):
 
 
 class PhoneAuthView(APIView):
+    @extend_schema(
+        parameters=[PhoneAuthSerializer],
+        responses={200: None,
+                   400: None},
+    )
     def get(self, request):
         try:
             p_num = request.query_params['phone_number']
@@ -67,13 +84,16 @@ class PhoneAuthView(APIView):
             else:
                 return Response({'message': 'Fail'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(
+        request=PhoneAuthSerializer,
+        responses={200: None,
+                   400: None}
+    )
     def post(self, request):
         try:
             p_num = request.data['phone_number']
         except KeyError:
-            return Response({
-                'message': 'Bad Request'
-                }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             PhoneAuth.objects.update_or_create(phone_number=p_num)
-            return Response({'message': 'OK'})
+            return Response({'message': 'OK'}, status=status.HTTP_201_CREATED)

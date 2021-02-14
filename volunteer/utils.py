@@ -1,12 +1,12 @@
-from volunteer.models import Tag
+from volunteer.models import Tag, Recruitment
 
 
-def update_tag(tags, recruitment):
-    tags = tags.spilt(',')
+def update_tag(tags: str, recruitment: Recruitment):
+    tags = tags.split(',')
     for tag in tags:
         if not tag:
             continue
         else:
             tag = tag.strip()
-            tag_, created = Tag.objects.get_or_create(name=tag)
-            recruitment.tags.add(tag_)
+            tag, created = Tag.objects.get_or_create(text=tag)
+            recruitment.tags.add(tag)

@@ -11,7 +11,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class RecruitmentSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(required=False)
+    tags = TagSerializer(required=False, many=True, read_only=True)
 
     def create(self, validated_data):
         return Recruitment.objects.create(**validated_data)

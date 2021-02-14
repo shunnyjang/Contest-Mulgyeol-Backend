@@ -1,14 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.http import Http404
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.permissions import IsOwnShelterOrReadOnly
-from volunteer.APIs.serializer_for_schema import RecruitmentSearchSerializer, JWTTokenScheme, \
-    RecruitmentPostRequestSerializer
+from volunteer.APIs.serializer_for_schema import RecruitmentSearchSerializer, RecruitmentPostRequestSerializer
 from volunteer.models import Recruitment
 from volunteer.serializers import RecruitmentSerializer
 from volunteer.utils import update_tag
@@ -24,11 +23,14 @@ class RecruitmentView(APIView):
         responses=RecruitmentSerializer,
     )
     def get(self, request):
-        search_tags = request.GET.getlist('tags', [])
-        tag_filter_recruitments = {}
-        for i in range(0, search_tags.count()):
-            tag_filter_recruitments[i] = search_tags[i]
-        recruitment_serializer = RecruitmentSerializer(**tag_filter_recruitments, many=True)
+        search_tags = request.GET.getlist('tag', [])
+
+        if search_tags:
+            recruitment = Recruitment.objects.filter(tags__text__in=search_tags)
+        else:
+            recruitment = Recruitment.objects.all()
+
+        recruitment_serializer = RecruitmentSerializer(recruitment, many=True)
         return Response(recruitment_serializer.data)
 
     @extend_schema(
@@ -52,9 +54,9 @@ class RecruitmentView(APIView):
                 "response": "error",
                 "message": recruitment_serializer.errors
             }, status=status.HTTP_401_UNAUTHORIZED)
-        recruitment_serializer.save()  # 봉사 모집 포스트 업로드 완료
+        recruitment_object = recruitment_serializer.save()  # 봉사 모집 포스트 업로드 완료
 
-        update_tag(request.data.get('tags'), recruitment_serializer.Meta.model)
+        update_tag(request.data.get('tags'), recruitment_object)
         return Response({  # 포스트 업로드 & 태그 등록 완료
             "response": "success",
             "message": "성공적으로 봉사모집을 업로드했습니다."

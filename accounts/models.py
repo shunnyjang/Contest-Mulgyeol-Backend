@@ -1,16 +1,9 @@
-from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
 # SMS 인증
 from model_utils.models import TimeStampedModel
 from random import randint
-import time
-import requests
-import hashlib
-import hmac
-import base64
-import json
-from config.settings.base import SMS_ACCESS_KEY, SMS_SECRET_KEY, SMS_SERVICE_ID, SMS_FROM_NUMBER
+from accounts.utils import send_sms
 
 # thumbnail
 import os
@@ -18,16 +11,17 @@ from uuid import uuid4
 from django.db import models
 from django.utils import timezone
 
-def date_upload_to(instance, filename):
+
+def date_upload_to(filename):
     ymd_path = timezone.now().strftime('%Y/%m/%d')
     uuid_name = uuid4().hex
     extension = os.path.splitext(filename)[-1].lower()
     return '/'.join([ymd_path, uuid_name + extension, ])
 
 
-def thumbnail_upload_to(instance, filename):
+def thumbnail_upload_to(instance):
     shelter = instance.user.userID
-    return "%s.png" % (shelter)
+    return "%s.png" % shelter
 
 
 class UserManager(BaseUserManager):
@@ -86,7 +80,6 @@ class Shelter(models.Model):
     url = models.CharField("보호소 홍보 SNS URL", max_length=200, blank=True)
     chat_url = models.CharField("보호소 오픈채팅 URL", max_length=200, blank=True)
     status = models.CharField("동물 보호 현황", max_length=100, null=False, default="개 0마리")
-    limit_of_volunteer = models.PositiveIntegerField(default=9)
     content = models.TextField("보호소 소개", blank=True)
     caution = models.TextField("봉사 주의사항", blank=True)
 
@@ -105,43 +98,12 @@ class PhoneAuth(TimeStampedModel):
     def save(self, *args, **kwargs):
         self.auth_number = randint(1000, 10000)
         super().save(*args, **kwargs)
-        self.send_sms()
-    
-    def	make_signature(self, access_key, secret_key, timestamp):
-        method = "POST"
-        uri = "/sms/v2/services/%s/messages" % (SMS_SERVICE_ID)
+        send_sms(auth_number=self.auth_number, phone_number=self.phone_number)
 
-        message = method + " " + uri + "\n" + timestamp + "\n" + access_key
-        message = bytes(message, 'UTF-8')
-        signingKey = base64.b64encode(hmac.new(secret_key, message, digestmod=hashlib.sha256).digest())
-        return signingKey
-    
-    def send_sms(self):
-        timestamp = str(int(time.time() * 1000))
-        access_key = SMS_ACCESS_KEY
-        secret_key = SMS_SECRET_KEY
-        secret_key = bytes(secret_key, 'UTF-8')
-        signature = self.make_signature(access_key, secret_key, timestamp)
-
-        url = "https://sens.apigw.ntruss.com/sms/v2/services/%s/messages" % (SMS_SERVICE_ID)
-        content = {
-            "type": "SMS",
-            "from": SMS_FROM_NUMBER,
-            "content": "[테스트] 인증 번호 [%d]를 입력해주세요." % (self.auth_number),
-            "messages":[
-                {
-                    "to": self.phone_number
-                }
-            ]
-        }
-        headers = {
-            "Content-Type": "application/json; charset=utf-8",
-            "x-ncp-apigw-timestamp": timestamp,
-            "x-ncp-iam-access-key": access_key,
-            "x-ncp-apigw-signature-v2": signature
-        }
-        res = requests.post(url, headers=headers, data=json.dumps(content))
-        
     class Meta:
+        def __init__(self):
+            self.auth_number = None
+            self.phone_number = None
+
         def __str__(self):
             return "%s[%s]" % (self.phone_number, self.auth_number)

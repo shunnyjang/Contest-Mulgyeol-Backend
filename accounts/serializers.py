@@ -1,8 +1,6 @@
-from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
-from accounts.models import User, Shelter
+from accounts.models import User, Shelter, PhoneAuth
 
-User = get_user_model()
 
 class UserSerializer(serializers.Serializer):
     userID = serializers.CharField(required=True)
@@ -12,14 +10,7 @@ class UserSerializer(serializers.Serializer):
     role = serializers.CharField(required=True)
 
     class Meta:
-        fields = [
-            'id',
-            'userID',
-            'password',
-            'name',
-            'phone',
-            'role'
-        ]
+        fields = '__all__'
 
     def create(self, validated_data):
         user = User.objects.create(
@@ -31,23 +22,23 @@ class UserSerializer(serializers.Serializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
-        
+
+
 class ShelterSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='userID')
 
     class Meta:
         model = Shelter
+        fields = '__all__'
+
+
+class PhoneAuthSerializer(serializers.ModelSerializer):
+    phone_number = serializers.CharField(required=True)
+    auth_number = serializers.IntegerField(required=False, read_only=True)
+
+    class Meta:
+        model = PhoneAuth
         fields = [
-            'id',
-            'user',
-            'shelter_name',
-            'loc_short',
-            'loc_detail',
-            'thumbnail',
-            'url',
-            'chat_url',
-            'status',
-            'limit_of_volunteer',
-            'content',
-            'caution'
+            'phone_number',
+            'auth_number'
         ]

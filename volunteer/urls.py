@@ -1,10 +1,10 @@
 from django.urls import path
-from . import views
+from .APIs import applyment, recruitment
 
 urlpatterns = [
-    path('', views.PostView.as_view(), name='post'),
-    path('<int:pk>/', views.PostDetailView.as_view(), name='post_detail'),
-    path('status/', views.VolunteerRetrieveView.as_view(), name='volunteer_status'),
-    path('apply/', views.VolunteerApplyView.as_view(), name='volunteer_apply'),
-    path('list/', views.UserVolunteerRetrieveView.as_view(), name='volunteer_list'),
+    path('', recruitment.RecruitmentView.as_view(), name='recruitment_list'),
+    path('<int:pk>/', recruitment.RecruitmentDetailView.as_view(), name='recruitment_detail'),
+    path('status/', applyment.list_of_volunteer_for_shelter, name='volunteer_status'),
+    path('apply/', applyment.VolunteerApplyView.as_view(), name='volunteer_apply'),
+    path('list/', applyment.list_of_applying_volunteer_of_user, name='applying_volunteer_list'),
 ]

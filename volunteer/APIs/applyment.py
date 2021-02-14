@@ -1,5 +1,5 @@
-from calendar import calendar
-from datetime import date
+import calendar
+from datetime import date, timedelta
 
 from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema
@@ -23,14 +23,13 @@ class VolunteerApplyView(APIView):
     )
     def get(self, request, format=None):
         """
-        봉사 가능 날짜 확인 (이번 달)
+        봉사 가능 날짜 확인 (30)
         """
         today = date.today()
-        last_day_of_the_month = calendar.monthrange(today.year, today.month)[1]
-        last_day_of_the_month = date(today.year, today.month, last_day_of_the_month)
+        date_limit = today + timedelta(days=30)
 
         volunteer_recruitment_calendar = DailyRecruitmentStatus.objects.filter(
-            shelter=request.query_params['shelter'], date__gt=today, date__lte=last_day_of_the_month)
+            shelter=request.query_params['shelter'], date__gt=today, date__lte=date_limit)
         recruitment_status_serializer = DailyRecruitmentStatusSerializer(volunteer_recruitment_calendar, many=True)
         return Response(recruitment_status_serializer.data)
 

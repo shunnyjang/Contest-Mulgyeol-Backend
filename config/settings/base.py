@@ -116,13 +116,10 @@ AUTH_PASSWORD_VALIDATORS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
 
 # AWS S3 Storage
-#DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-#STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # AWS Access
 AWS_ACCESS_KEY_ID = get_secret('AWS_ACCESS_KEY_ID')
@@ -135,8 +132,8 @@ AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 AWS_DEFAULT_ACL = 'public-read'
-#AWS_MEDIA_LOCATION = 'media'
-#MEDIA = 'http://%s/%s' % (AWS_S3_CUSTOM_DOMAIN, AWS_MEDIA_LOCATION)
+AWS_MEDIA_LOCATION = 'media'
+MEDIA = 'http://%s/%s' % (AWS_S3_CUSTOM_DOMAIN, AWS_MEDIA_LOCATION)
 
 
 # Internationalization

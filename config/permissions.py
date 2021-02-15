@@ -2,6 +2,7 @@ from rest_framework.permissions import BasePermission
 
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
+
 class IsAuthShelter(BasePermission):
     """
     활성화된 보호소 담당자만 접근할 수 있는 권한이 주어집니다.
@@ -20,6 +21,7 @@ class IsAuthShelterOrReadOnly(BasePermission):
             return bool(request.method in SAFE_METHODS)
         else:
             return bool(request.method in SAFE_METHODS or request.user.role == "2" and request.user.is_active)
+
 
 class IsOwnShelterOrReadOnly(BasePermission):
     """

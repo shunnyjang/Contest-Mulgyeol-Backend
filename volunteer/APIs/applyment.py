@@ -1,4 +1,3 @@
-import calendar
 from datetime import date, timedelta
 
 from django.contrib.auth import get_user_model
@@ -9,10 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.models import Shelter
+from accounts.models import Shelter, User
 from volunteer.APIs.serializer_for_schema import VolunteerApplyReqeustSeriazlier
 from volunteer.models import DailyRecruitmentStatus, Volunteer
-from volunteer.serializers import DailyRecruitmentStatusSerializer, VolunteerSerializer
+from volunteer.serializers import DailyRecruitmentStatusSerializer, VolunteerSerializer, \
+    DailyRecruitmentVolunteerSerializer
 
 
 class VolunteerApplyView(APIView):
@@ -43,10 +43,26 @@ class VolunteerApplyView(APIView):
         봉사 신청
         """
         user = get_user_model().objects.get(pk=request.user.pk)
-        applying_for = DailyRecruitmentStatus.objects.get(
-            shelter=request.data.get('shelter'), date=request.data.get('date'))
-        applying_for.current_number += 1
-        if applying_for.current_number <= applying_for.need_number:
+        try:
+            applying_for = DailyRecruitmentStatus.objects.get(
+                shelter=request.data.get('shelter'), date=request.data.get('date'))
+        except DailyRecruitmentStatus.DoesNotExist:
+            return Response({
+                "response": "error",
+                "message": "해당 날짜에는 보호소에서 봉사를 모집하지 않습니다."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            if applying_for.applicant.get(pk=user.pk):
+                return Response({
+                    "response": "error",
+                    "message": "이미 신청한 이력이 있습니다."
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            pass
+
+        if applying_for.current_number + 1 <= applying_for.need_number:
+            applying_for.current_number += 1
             applying_for.applicant.add(user)
             applying_for.save()
         else:
@@ -63,6 +79,7 @@ class VolunteerApplyView(APIView):
                 "response": "success",
                 "message": "봉사신청이 완료되었습니다."
             }, status=status.HTTP_201_CREATED)
+
         return Response({
             "response": "error",
             "message": volunteer_serializer.errors
@@ -84,13 +101,13 @@ def list_of_applying_volunteer_of_user(request):
 
 @extend_schema(
     description="보호소가 봉사신청한 봉사자 목록을 확인할 수 있는 API입니다.",
-    responses=VolunteerSerializer
+    responses=DailyRecruitmentVolunteerSerializer
 )
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_of_volunteer_for_shelter(request):
     user = get_user_model().objects.get(pk=request.user.pk)
     shelter = Shelter.objects.get(user=user)
-    list_of_volunteer = Volunteer.objects.filter(applying_for__shelter=shelter)
-    volunteer_serializer = VolunteerSerializer(list_of_volunteer, many=True)
+    list_of_volunteer = DailyRecruitmentStatus.objects.filter(shelter=shelter)
+    volunteer_serializer = DailyRecruitmentVolunteerSerializer(list_of_volunteer, many=True)
     return Response(volunteer_serializer.data)

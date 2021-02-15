@@ -3,6 +3,17 @@ from rest_framework import serializers
 from volunteer.models import Tag
 
 
+class ApiResponseSerializer(serializers.Serializer):
+    response = serializers.CharField()
+    message = serializers.CharField()
+
+    class Meta:
+        field = [
+            'response',
+            'message'
+        ]
+
+
 class VolunteerApplyReqeustSeriazlier(serializers.Serializer):
     shelter = serializers.CharField(required=True)
     date = serializers.DateField(required=True)

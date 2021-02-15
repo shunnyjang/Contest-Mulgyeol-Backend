@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.http import Http404
-from drf_spectacular.utils import extend_schema, OpenApiExample
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from config.permissions import IsOwnShelterOrReadOnly
 from volunteer.APIs.serializer_for_schema import RecruitmentSearchSerializer, RecruitmentPostRequestSerializer, \
     DailyRecruitmentPostRequestSerializer, DailyRecruitmentPostResponeSerializer, \
-    DailyRecruitmentDetailRequestSerializer
+    DailyRecruitmentDetailRequestSerializer, ApiResponseSerializer
 from volunteer.models import Recruitment, DailyRecruitmentStatus
 from volunteer.serializers import RecruitmentSerializer, DailyRecruitmentStatusSerializer
 from volunteer.utils import update_tag
@@ -21,7 +21,11 @@ class RecruitmentView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     @extend_schema(
-        description="전국의 보호소들이 올린 자원봉사자 모집 공고를 확인할 수 있는 API입니다. parameter로 검색하고자 하는 tag들을 보내 검색할 수 있습니다.",
+        description="""
+        전국의 보호소들이 올린 자원봉사자 모집 공고를 확인할 수 있는 API입니다. 
+        parameter로 검색하고자 하는 tag들을 보내 검색할 수 있습니다.
+        tag는 여러 개 중첩 사용가능합니다. (OR로 검색 결과 반환)
+        """,
         parameters=[RecruitmentSearchSerializer],
         responses=RecruitmentSerializer,
     )
@@ -39,8 +43,8 @@ class RecruitmentView(APIView):
     @extend_schema(
         description="보호소들이 자원 봉사자 모집 공고를 올릴 수 있는 API입니다.",
         request=RecruitmentPostRequestSerializer,
-        responses={201: None,
-                   400: None}
+        responses={201: ApiResponseSerializer,
+                   400: ApiResponseSerializer}
     )
     def post(self, request):
         user = get_user_model().objects.get(pk=request.user.pk)
@@ -88,7 +92,7 @@ class RecruitmentDetailView(APIView):
         description="해당 모집 공고를 부분적으로 수정할 수 있는 API입니다. 수정하고자 하는 일부 field를 request에 포함하면 됩니다.",
         request=RecruitmentPostRequestSerializer,
         responses={200: RecruitmentSerializer,
-                   400: None}
+                   400: ApiResponseSerializer}
     )
     def patch(self, request, pk, format=None):
         recruitment = self.get_object(pk)
@@ -133,7 +137,7 @@ class RecruitmentDetailView(APIView):
             request_only=True),
     ],
     request=DailyRecruitmentPostRequestSerializer,
-    responses={201: None,
+    responses={201: ApiResponseSerializer,
                400: DailyRecruitmentPostResponeSerializer}
 )
 @api_view(['POST'])
@@ -183,7 +187,7 @@ class DailyRecruitmentDetailView(APIView):
         description="해당 모집 공고를 부분적으로 수정할 수 있는 API입니다. 그 날 필요한 인원수를 수정할 수 있습니다.",
         request=DailyRecruitmentDetailRequestSerializer,
         responses={200: DailyRecruitmentStatusSerializer,
-                   400: None}
+                   400: ApiResponseSerializer}
     )
     def patch(self, request, pk, format=None):
         daily_recruitment = self.get_object(pk)

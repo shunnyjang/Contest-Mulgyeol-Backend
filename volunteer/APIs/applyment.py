@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import Shelter, User
-from volunteer.APIs.serializer_for_schema import VolunteerApplyReqeustSeriazlier
+from volunteer.APIs.serializer_for_schema import VolunteerApplyReqeustSeriazlier, ApiResponseSerializer
 from volunteer.models import DailyRecruitmentStatus, Volunteer
 from volunteer.serializers import DailyRecruitmentStatusSerializer, VolunteerSerializer, \
     DailyRecruitmentVolunteerSerializer
@@ -35,8 +35,8 @@ class VolunteerApplyView(APIView):
 
     @extend_schema(
         request=VolunteerApplyReqeustSeriazlier,
-        responses={201: None,
-                   400: None}
+        responses={201: ApiResponseSerializer,
+                   400: ApiResponseSerializer}
     )
     def post(self, request, format=None):
         """

@@ -22,12 +22,43 @@ class RecruitmentSerializer(serializers.ModelSerializer):
 
 
 class DailyRecruitmentStatusSerializer(serializers.ModelSerializer):
+
+    def update(self, instance, validated_data):
+        instance.need_number = validated_data.get('need_number', instance.need_number)
+        instance.save()
+        return instance
+
     class Meta:
         model = DailyRecruitmentStatus
-        fields = '__all__'
+        fields = [
+            "id",
+            "shelter",
+            "date",
+            "need_number",
+            "current_number",
+        ]
+
+
+class DailyRecruitmentVolunteerSerializer(serializers.ModelSerializer):
+    applicant = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = DailyRecruitmentStatus
+        fields = [
+            "id",
+            "shelter",
+            "date",
+            "need_number",
+            "current_number",
+            'applicant'
+        ]
 
 
 class VolunteerSerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        return Volunteer.objects.create(**validated_data)
+
     class Meta:
         model = Volunteer
         fields = '__all__'

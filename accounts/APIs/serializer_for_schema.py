@@ -3,6 +3,17 @@ from rest_framework import serializers
 from accounts.serializers import UserSerializer, ShelterSerializer
 
 
+class ApiResponseSerializer(serializers.Serializer):
+    response = serializers.CharField()
+    message = serializers.CharField()
+
+    class Meta:
+        field = [
+            'response',
+            'message'
+        ]
+
+
 class CheckIdRequestSerializer(serializers.Serializer):
     id = serializers.CharField(required=True)
 

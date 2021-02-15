@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.APIs.serializer_for_schema import ShelterCreateRequestSerializer
+from accounts.APIs.serializer_for_schema import ShelterCreateRequestSerializer, ApiResponseSerializer
 from accounts.models import Shelter
 from accounts.serializers import UserSerializer, ShelterSerializer
 from config.permissions import IsOwnShelterOrReadOnly
@@ -17,8 +17,8 @@ class ShelterCreateView(APIView):
 
     @extend_schema(
         request=ShelterCreateRequestSerializer,
-        responses={200: None,
-                   400: None}
+        responses={200: ApiResponseSerializer,
+                   400: ApiResponseSerializer}
     )
     def post(self, request, *args, **kwargs):
         user = UserSerializer(data=request.data.get('profile'))
@@ -63,8 +63,8 @@ class ShelterDetailView(APIView):
     @extend_schema(
         description="보호소 정보를 부분적으로 수정할 수 있는 API입니다. 수정하고자 하는 것만 request body로 포함하면 됩니다.",
         request=ShelterSerializer,
-        responses={200: None,
-                   400: None}
+        responses={200: ApiResponseSerializer,
+                   400: ApiResponseSerializer}
     )
     def patch(self, request, pk, format=None):
         try:

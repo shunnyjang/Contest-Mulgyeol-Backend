@@ -3,6 +3,17 @@ from rest_framework import serializers
 from volunteer.models import Tag
 
 
+class ApiResponseSerializer(serializers.Serializer):
+    response = serializers.CharField()
+    message = serializers.CharField()
+
+    class Meta:
+        field = [
+            'response',
+            'message'
+        ]
+
+
 class VolunteerApplyReqeustSeriazlier(serializers.Serializer):
     shelter = serializers.CharField(required=True)
     date = serializers.DateField(required=True)
@@ -40,24 +51,40 @@ class RecruitmentPostRequestSerializer(serializers.Serializer):
         ]
 
 
-class JWTTokenScheme(OpenApiAuthenticationExtension):
-    target_class = 'rest_framework_jwt.authentication.JSONWebTokenAuthentication'
-    name = 'tokenAuth'
-    match_subclasses = True
-    priority = -1
+class DailyRecruitmentPostSerializer(serializers.Serializer):
+    date = serializers.CharField(required=True)
+    need_number = serializers.IntegerField(required=True)
 
-    def get_security_definition(self, auto_schema):
-        if self.target.keyword == 'Bearer':
-            return {
-                'type': 'http',
-                'scheme': 'bearer',
-            }
-        else:
-            return {
-                'type': 'apiKey',
-                'in': 'header',
-                'name': 'Authorization',
-                'description': _(
-                    'Token-based authentication with required prefix "%s"'
-                ) % self.target.keyword
-            }
+    class Meta:
+        field = [
+            'shelter',
+            'date',
+            'need_number'
+        ]
+
+
+class DailyRecruitmentPostRequestSerializer(serializers.Serializer):
+    available_date = DailyRecruitmentPostSerializer(many=True)
+
+    class Meta:
+        field = ['available_date']
+
+
+class DailyRecruitmentPostResponeSerializer(serializers.Serializer):
+    response = serializers.CharField()
+    message = serializers.CharField()
+    unavailable_date = serializers.DateField()
+
+    class Meta:
+        field = [
+            'response',
+            'message',
+            'unavailable_date'
+        ]
+
+
+class DailyRecruitmentDetailRequestSerializer(serializers.Serializer):
+    need_number = serializers.IntegerField(required=True)
+
+    class Meta:
+        field = ['need_number']

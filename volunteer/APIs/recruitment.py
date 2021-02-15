@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.http import Http404
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiExample
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -110,6 +110,28 @@ class RecruitmentDetailView(APIView):
 
 
 @extend_schema(
+    description="보호소에서 봉사자를 모집하는 날짜를 업로드하는 API입니다. 가능 날짜와 모집하는 인원을 request로 받습니다.",
+    examples=[
+        OpenApiExample(
+            'Valid Example 1',
+            value={
+                "available_date": [
+                    {
+                        "date": "2020-03-01",
+                        "need_number": 5
+                    },
+                    {
+                        "date": "2020-03-02",
+                        "need_number": 6
+                    },
+                    {
+                        "date": "2020-03-03",
+                        "need_number": 2
+                    }
+                ]
+            },
+            request_only=True),
+    ],
     request=DailyRecruitmentPostRequestSerializer,
     responses={201: None,
                400: DailyRecruitmentPostResponeSerializer}
@@ -120,7 +142,7 @@ def update_new_daily_recruitment_by_shelter(request):
     user = get_user_model().objects.get(pk=request.user.pk)
     shelter = user.shelter.pk
 
-    data = request.data.get('available')
+    data = request.data.get('available_date')
     for i in range(0, len(data)):
         data[i]['shelter'] = shelter
         daily_recruitment_serializer = DailyRecruitmentStatusSerializer(data=data[i])

@@ -53,10 +53,10 @@ class DailyRecruitmentPostSerializer(serializers.Serializer):
 
 
 class DailyRecruitmentPostRequestSerializer(serializers.Serializer):
-    avaliable = DailyRecruitmentPostSerializer(many=True, read_only=True)
+    available_date = DailyRecruitmentPostSerializer(many=True)
 
     class Meta:
-        field = ['available']
+        field = ['available_date']
 
 
 class DailyRecruitmentPostResponeSerializer(serializers.Serializer):

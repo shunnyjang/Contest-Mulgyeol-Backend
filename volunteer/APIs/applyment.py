@@ -8,8 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.APIs.serializer_for_schema import ApiResponseSerializer
 from accounts.models import Shelter, User
-from volunteer.APIs.serializer_for_schema import VolunteerApplyReqeustSeriazlier, ApiResponseSerializer
+from volunteer.APIs.serializer_for_schema import VolunteerApplyReqeustSeriazlier
 from volunteer.models import DailyRecruitmentStatus, Volunteer
 from volunteer.serializers import DailyRecruitmentStatusSerializer, VolunteerSerializer, \
     DailyRecruitmentVolunteerSerializer

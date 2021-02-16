@@ -7,17 +7,18 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from config.permissions import IsOwnShelterOrReadOnly
+from accounts.APIs.serializer_for_schema import ApiResponseSerializer
+from config.permissions import IsAuthShelterOrReadOnly
 from volunteer.APIs.serializer_for_schema import RecruitmentSearchSerializer, RecruitmentPostRequestSerializer, \
     DailyRecruitmentPostRequestSerializer, DailyRecruitmentPostResponeSerializer, \
-    DailyRecruitmentDetailRequestSerializer, ApiResponseSerializer
+    DailyRecruitmentDetailRequestSerializer
 from volunteer.models import Recruitment, DailyRecruitmentStatus
 from volunteer.serializers import RecruitmentSerializer, DailyRecruitmentStatusSerializer
 from volunteer.utils import update_tag
 
 
 class RecruitmentView(APIView):
-    permission_classes = [IsOwnShelterOrReadOnly]
+    permission_classes = [IsAuthShelterOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
 
     @extend_schema(
@@ -71,7 +72,7 @@ class RecruitmentView(APIView):
 
 
 class RecruitmentDetailView(APIView):
-    permission_classes = [IsOwnShelterOrReadOnly]
+    permission_classes = [IsAuthShelterOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -141,7 +142,7 @@ class RecruitmentDetailView(APIView):
                400: DailyRecruitmentPostResponeSerializer}
 )
 @api_view(['POST'])
-@permission_classes([IsOwnShelterOrReadOnly])
+@permission_classes([IsAuthShelterOrReadOnly])
 def update_new_daily_recruitment_by_shelter(request):
     user = get_user_model().objects.get(pk=request.user.pk)
     shelter = user.shelter.pk
@@ -166,7 +167,7 @@ def update_new_daily_recruitment_by_shelter(request):
 
 
 class DailyRecruitmentDetailView(APIView):
-    permission_classes = [IsOwnShelterOrReadOnly]
+    permission_classes = [IsAuthShelterOrReadOnly]
 
     def get_object(self, pk):
         try:

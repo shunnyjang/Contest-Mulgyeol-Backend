@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from accounts.APIs.serializer_for_schema import ShelterCreateRequestSerializer, ApiResponseSerializer
 from accounts.models import Shelter
 from accounts.serializers import UserSerializer, ShelterSerializer
-from config.permissions import IsOwnShelterOrReadOnly
+from config.permissions import IsAuthShelterOrReadOnly
 
 
 class ShelterCreateView(APIView):
@@ -43,7 +43,7 @@ class ShelterCreateView(APIView):
 
 
 class ShelterDetailView(APIView):
-    permission_classes = [IsOwnShelterOrReadOnly]
+    permission_classes = [IsAuthShelterOrReadOnly]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_object(self, pk):

@@ -1,7 +1,7 @@
 from django.db import models
 from accounts.models import Shelter
 
-#image
+# image
 import os
 from uuid import uuid4
 from django.db import models
@@ -20,6 +20,12 @@ class Community(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(blank=True, upload_to=date_upload_to)
     content = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+        def __str__(self):
+            return "(%d) %s" % (self.shelter.shelter_name, self.created_at)
 
 
 class Charity(models.Model):

@@ -12,11 +12,11 @@ from django.db import models
 from django.utils import timezone
 
 
-def date_upload_to(filename):
-    ymd_path = timezone.now().strftime('%Y/%m/%d')
-    uuid_name = uuid4().hex
+def date_upload_to(instance, filename):
+    # ymd_path = timezone.now().strftime('%Y/%m/%d')
+    path = "shelter" + str(instance.pk) + "_thumbnail"
     extension = os.path.splitext(filename)[-1].lower()
-    return '/'.join([ymd_path, uuid_name + extension, ])
+    return path + extension
 
 
 def thumbnail_upload_to(instance):

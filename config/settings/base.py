@@ -135,6 +135,12 @@ AWS_DEFAULT_ACL = 'public-read'
 AWS_MEDIA_LOCATION = 'media'
 MEDIA = 'http://%s/%s' % (AWS_S3_CUSTOM_DOMAIN, AWS_MEDIA_LOCATION)
 
+# static
+STATIC_URL = os.path.join(BASE_DIR, '/static/')
+STATICFILES_DIRS = [
+    STATIC_URL,
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/

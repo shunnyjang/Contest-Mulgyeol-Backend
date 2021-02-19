@@ -6,6 +6,8 @@ def update_tag(tags: str, recruitment: Recruitment):
     for tag in tags:
         if not tag:
             break
+        elif len(tag) < 2:
+            continue
         else:
             tag = tag.strip()
             tag, created = Tag.objects.get_or_create(text=tag)

@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 
 from accounts.APIs.serializer_for_schema import ApiResponseSerializer
 from accounts.models import Shelter, User
-from volunteer.APIs.serializer_for_schema import VolunteerApplyReqeustSeriazlier
+from volunteer.APIs.serializer_for_schema import VolunteerApplyReqeustSeriazlier, VolunteerResponseSerializer
 from volunteer.models import DailyRecruitmentStatus, Volunteer
 from volunteer.serializers import DailyRecruitmentStatusSerializer, VolunteerSerializer, \
     DailyRecruitmentVolunteerSerializer
@@ -89,7 +89,7 @@ class VolunteerApplyView(APIView):
 
 @extend_schema(
     description="사용자가 자신의 봉사신청 내역을 확인할 수 있는 API입니다.",
-    responses=VolunteerSerializer
+    responses=VolunteerResponseSerializer
 )
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone
 
 
-def date_upload_to(filename):
+def date_upload_to(instance, filename):
     ymd_path = timezone.now().strftime('%Y/%m/%d')
     uuid_name = uuid4().hex
     extension = os.path.splitext(filename)[-1].lower()

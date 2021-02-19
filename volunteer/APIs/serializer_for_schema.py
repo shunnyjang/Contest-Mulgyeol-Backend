@@ -1,6 +1,9 @@
 from drf_spectacular.extensions import OpenApiAuthenticationExtension
 from rest_framework import serializers
-from volunteer.models import Tag
+
+from accounts.models import User
+from volunteer.models import Tag, DailyRecruitmentStatus
+from volunteer.serializers import TagSerializer
 
 
 class VolunteerApplyReqeustSeriazlier(serializers.Serializer):
@@ -15,12 +18,26 @@ class VolunteerApplyReqeustSeriazlier(serializers.Serializer):
 
 
 class RecruitmentSearchSerializer(serializers.Serializer):
-    tags = serializers.CharField()
+    tags = serializers.CharField(required=False)
 
     class Meta:
         field = [
             'tags'
         ]
+
+
+class RecruitmentResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    tags = TagSerializer(many=True)
+    created_at = serializers.DateTimeField()
+    image = serializers.ImageField()
+    information = serializers.CharField()
+    shelter = serializers.IntegerField()
+    shelter_name = serializers.CharField()
+    shelter_thumbnail = serializers.CharField()
+
+    class Meta:
+        field = '__all__'
 
 
 class RecruitmentPostRequestSerializer(serializers.Serializer):
@@ -77,3 +94,16 @@ class DailyRecruitmentDetailRequestSerializer(serializers.Serializer):
 
     class Meta:
         field = ['need_number']
+
+
+class VolunteerResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    user = serializers.IntegerField()
+    applied_at = serializers.DateTimeField()
+    applying_for = serializers.IntegerField()
+    applying_date = serializers.DateField()
+    shelter_name = serializers.CharField()
+    shelter_chat_url = serializers.CharField()
+
+    class Meta:
+        field = '__all__'

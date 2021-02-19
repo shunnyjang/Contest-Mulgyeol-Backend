@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from volunteer.models import Recruitment, DailyRecruitmentStatus, Volunteer, Tag
 
 
@@ -15,6 +16,12 @@ class RecruitmentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Recruitment.objects.create(**validated_data)
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['shelter_name'] = instance.shelter.shelter_name
+        response['shelter_thumbnail'] = str(instance.shelter.thumbnail)
+        return response
 
     class Meta:
         model = Recruitment
@@ -58,6 +65,13 @@ class VolunteerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Volunteer.objects.create(**validated_data)
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['applying_date'] = instance.applying_for.date
+        response['shelter_name'] = instance.applying_for.shelter.shelter_name
+        response['shelter_chat_url'] = instance.applying_for.shelter.chat_url
+        return response
 
     class Meta:
         model = Volunteer

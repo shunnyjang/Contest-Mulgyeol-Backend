@@ -11,7 +11,7 @@ from accounts.APIs.serializer_for_schema import ApiResponseSerializer
 from config.permissions import IsAuthShelterOrReadOnly
 from volunteer.APIs.serializer_for_schema import RecruitmentSearchSerializer, RecruitmentPostRequestSerializer, \
     DailyRecruitmentPostRequestSerializer, DailyRecruitmentPostResponeSerializer, \
-    DailyRecruitmentDetailRequestSerializer
+    DailyRecruitmentDetailRequestSerializer, RecruitmentResponseSerializer
 from volunteer.models import Recruitment, DailyRecruitmentStatus
 from volunteer.serializers import RecruitmentSerializer, DailyRecruitmentStatusSerializer
 from volunteer.utils import update_tag
@@ -28,7 +28,7 @@ class RecruitmentView(APIView):
         tag는 여러 개 중첩 사용가능합니다. (OR로 검색 결과 반환)
         """,
         parameters=[RecruitmentSearchSerializer],
-        responses=RecruitmentSerializer,
+        responses=RecruitmentResponseSerializer,
     )
     def get(self, request):
         search_tags = request.GET.getlist('tag', [])

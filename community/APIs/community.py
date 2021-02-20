@@ -35,7 +35,7 @@ class CommunityView(APIView):
     )
     def post(self, request, format=None):
         user = get_user_model().objects.get(pk=request.user.pk)
-        request.data['shelter'] = user.shelter
+        request.data['shelter'] = user.shelter.pk
 
         serializer = CommunitySerializer(data=request.data)
         if serializer.is_valid():

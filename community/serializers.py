@@ -12,7 +12,7 @@ class CommunitySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['shelter_name'] = instance.shelter.shelter_name
-        response['shelter_thumbnail'] = instance.shelter.thumbnail
+        response['shelter_thumbnail'] = str(instance.shelter.thumbnail)
         return response
 
     class Meta:

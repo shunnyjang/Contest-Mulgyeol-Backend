@@ -100,7 +100,7 @@ class RecruitmentDetailView(APIView):
 
         # 태그 수정시 모두 삭제하고 재등록
         if request.data.get('tags'):
-            tags = recruitment.tag.all()
+            tags = recruitment.tags.all()
             tags.delete()
             update_tag(request.data.get('tags'), recruitment)
 

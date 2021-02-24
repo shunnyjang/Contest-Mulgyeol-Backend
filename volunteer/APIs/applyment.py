@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from accounts.APIs.serializer_for_schema import ApiResponseSerializer
 from accounts.models import Shelter, User
 from volunteer.APIs.serializer_for_schema import VolunteerApplyReqeustSeriazlier, VolunteerResponseSerializer
-from volunteer.models import DailyRecruitmentStatus, Volunteer
+from volunteer.models import DailyRecruitmentStatus, Volunteer, Recruitment
 from volunteer.serializers import DailyRecruitmentStatusSerializer, VolunteerSerializer, \
     DailyRecruitmentVolunteerSerializer
 
@@ -26,11 +26,13 @@ class VolunteerApplyView(APIView):
         """
         봉사 가능 날짜 확인 (30)
         """
-        today = date.today()
-        date_limit = today + timedelta(days=30)
+        volunteer_recruitment_calendar = Recruitment.objects.get(shelter=request.query_params['shelter'])
+
+        start_date = volunteer_recruitment_calendar.start_date
+        end_date = volunteer_recruitment_calendar.end_date
 
         volunteer_recruitment_calendar = DailyRecruitmentStatus.objects.filter(
-            shelter=request.query_params['shelter'], date__gt=today, date__lte=date_limit)
+            shelter=request.query_params['shelter'], date__gt=start_date, date__lte=end_date)
         recruitment_status_serializer = DailyRecruitmentStatusSerializer(volunteer_recruitment_calendar, many=True)
         return Response(recruitment_status_serializer.data)
 
@@ -72,8 +74,8 @@ class VolunteerApplyView(APIView):
                 "message": "하루 봉사 인원 정원 초과, 관리자에게 직접 문의 바람"
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        volunteer_data = {"user": user, "applying_for": applying_for}
-        volunteer_serializer = VolunteerSerializer(volunteer_data)
+        volunteer_data = {"user": user.pk, "applying_for": applying_for.pk}
+        volunteer_serializer = VolunteerSerializer(data=volunteer_data)
         if volunteer_serializer.is_valid():
             volunteer_serializer.save()
             return Response({

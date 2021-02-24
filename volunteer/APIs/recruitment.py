@@ -114,6 +114,10 @@ class RecruitmentDetailView(APIView):
             recruitment.tags.clear()
             update_tag(request.data.get('tags'), recruitment)
 
+        save_daily_recruitment_objects(request.user.shelter,
+                                       request.data.get('start_date'),
+                                       request.data.get('end_date'))
+
         recruitment_serializer = RecruitmentSerializer(recruitment, data=request.data, partial=True)
         if recruitment_serializer.is_valid():
             recruitment_serializer.save()

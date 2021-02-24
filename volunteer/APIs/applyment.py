@@ -32,7 +32,7 @@ class VolunteerApplyView(APIView):
         end_date = shelter_recruitment_post.end_date
 
         volunteer_recruitment_calendar = DailyRecruitmentStatus.objects.filter(
-            shelter=request.query_params['shelter'], date__gt=start_date, date__lte=end_date)
+            shelter=request.query_params['shelter'], date__gte=start_date, date__lte=end_date)
         recruitment_status_serializer = DailyRecruitmentStatusSerializer(volunteer_recruitment_calendar, many=True)
         return Response(recruitment_status_serializer.data)
 

@@ -26,13 +26,9 @@ class Recruitment(models.Model):
     created_at = models.DateTimeField("업로드 날짜", auto_now=True)
     image = models.ImageField("첨부 이미지", upload_to=date_upload_to, null=True)
     information = models.TextField("봉사 설명", blank=True)
-<<<<<<< HEAD
     tags = models.ManyToManyField(Tag, verbose_name="태그", related_name='recruitment')
-=======
-    tags = models.ManyToManyField(Tag, verbose_name="태그")
     start_date = models.DateField(blank=False, default=timezone.now())
     end_date = models.DateField(blank=False, default=timezone.now() + timezone.timedelta(days=30))
->>>>>>> b944097f0661b25e7fc9ab0a737e8c99febedf88
 
     def __str__(self):
         return "[%s] %s 봉사모집" % (self.created_at, self.shelter)

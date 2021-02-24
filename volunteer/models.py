@@ -27,6 +27,8 @@ class Recruitment(models.Model):
     image = models.ImageField("첨부 이미지", upload_to=date_upload_to, null=True)
     information = models.TextField("봉사 설명", blank=True)
     tags = models.ManyToManyField(Tag, verbose_name="태그")
+    start_date = models.DateField(blank=False, default=timezone.now())
+    end_date = models.DateField(blank=False, default=timezone.now() + timezone.timedelta(days=30))
 
     def __str__(self):
         return "[%s] %s 봉사모집" % (self.created_at, self.shelter)
@@ -38,7 +40,6 @@ class Recruitment(models.Model):
 class DailyRecruitmentStatus(models.Model):
     shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE)
     date = models.DateField(null=False, blank=False, default=timezone.now)
-    need_number = models.PositiveIntegerField(default=9, verbose_name="필요한 인원")
     current_number = models.PositiveIntegerField(default=0, verbose_name="현재 인원")
     applicant = models.ManyToManyField(User)
 

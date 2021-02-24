@@ -14,7 +14,7 @@ from volunteer.APIs.serializer_for_schema import RecruitmentSearchSerializer, Re
     DailyRecruitmentDetailRequestSerializer, RecruitmentResponseSerializer
 from volunteer.models import Recruitment, DailyRecruitmentStatus
 from volunteer.serializers import RecruitmentSerializer, DailyRecruitmentStatusSerializer
-from volunteer.utils import update_tag
+from volunteer.utils import update_tag, save_daily_recruitment_objects
 
 
 class RecruitmentView(APIView):
@@ -65,6 +65,9 @@ class RecruitmentView(APIView):
         recruitment_object = recruitment_serializer.save()  # 봉사 모집 포스트 업로드 완료
 
         update_tag(request.data.get('tags'), recruitment_object)
+        save_daily_recruitment_objects(user.shelter.pk,
+                                       request.data.get('start_date'),
+                                       request.data.get('end_date'))
         return Response({  # 포스트 업로드 & 태그 등록 완료
             "response": "success",
             "message": "성공적으로 봉사모집을 업로드했습니다."
@@ -112,58 +115,6 @@ class RecruitmentDetailView(APIView):
             'response': 'error',
             'message': recruitment_serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
-
-
-@extend_schema(
-    description="보호소에서 봉사자를 모집하는 날짜를 업로드하는 API입니다. 가능 날짜와 모집하는 인원을 request로 받습니다.",
-    examples=[
-        OpenApiExample(
-            'Valid Example 1',
-            value={
-                "available_date": [
-                    {
-                        "date": "2020-03-01",
-                        "need_number": 5
-                    },
-                    {
-                        "date": "2020-03-02",
-                        "need_number": 6
-                    },
-                    {
-                        "date": "2020-03-03",
-                        "need_number": 2
-                    }
-                ]
-            },
-            request_only=True),
-    ],
-    request=DailyRecruitmentPostRequestSerializer,
-    responses={201: ApiResponseSerializer,
-               400: DailyRecruitmentPostResponeSerializer}
-)
-@api_view(['POST'])
-@permission_classes([IsAuthShelterOrReadOnly])
-def update_new_daily_recruitment_by_shelter(request):
-    user = get_user_model().objects.get(pk=request.user.pk)
-    shelter = user.shelter.pk
-
-    data = request.data.get('available_date')
-    for i in range(0, len(data)):
-        data[i]['shelter'] = shelter
-        daily_recruitment_serializer = DailyRecruitmentStatusSerializer(data=data[i])
-        if daily_recruitment_serializer.is_valid():
-            daily_recruitment_serializer.save()
-            continue
-        return Response({
-            'response': 'error',
-            'message': daily_recruitment_serializer.errors,
-            'unavailable_date': data[i].get('date')
-        }, status=status.HTTP_400_BAD_REQUEST)
-
-    return Response({
-        'response': 'success',
-        'message': '성공적으로 봉사 모집 날짜 업로드를 완료했습니다.'
-    }, status=status.HTTP_201_CREATED)
 
 
 class DailyRecruitmentDetailView(APIView):

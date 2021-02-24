@@ -48,12 +48,16 @@ class RecruitmentPostRequestSerializer(serializers.Serializer):
         required=True,
         slug_field='text'
     )
+    start_date = serializers.DateField(required=True),
+    end_date = serializers.DateField(required=True)
 
     class Meta:
         field = [
             'image',
             'information',
-            'tags'
+            'tags',
+            'start_date',
+            'end_date'
         ]
 
 

@@ -30,18 +30,12 @@ class RecruitmentSerializer(serializers.ModelSerializer):
 
 class DailyRecruitmentStatusSerializer(serializers.ModelSerializer):
 
-    def update(self, instance, validated_data):
-        instance.need_number = validated_data.get('need_number', instance.need_number)
-        instance.save()
-        return instance
-
     class Meta:
         model = DailyRecruitmentStatus
         fields = [
             "id",
             "shelter",
             "date",
-            "need_number",
             "current_number",
         ]
 
@@ -55,7 +49,6 @@ class DailyRecruitmentVolunteerSerializer(serializers.ModelSerializer):
             "id",
             "shelter",
             "date",
-            "need_number",
             "current_number",
             'applicant'
         ]

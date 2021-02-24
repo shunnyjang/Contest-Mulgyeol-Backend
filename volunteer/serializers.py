@@ -21,6 +21,7 @@ class RecruitmentSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['shelter_name'] = instance.shelter.shelter_name
         response['shelter_thumbnail'] = str(instance.shelter.thumbnail)
+        response['shelter_location'] = instance.shelter.loc_short
         return response
 
     class Meta:

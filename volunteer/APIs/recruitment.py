@@ -32,11 +32,15 @@ class RecruitmentView(APIView):
     )
     def get(self, request):
         search_tags = request.GET.getlist('tag', [])
+        search_location = request.GET.getlist('location', [])
 
         if search_tags:
             recruitment = Recruitment.objects.filter(tags__text__in=search_tags)
         else:
             recruitment = Recruitment.objects.all()
+
+        if search_location:
+            recruitment.filter(shelter__loc_short=search_location)
 
         recruitment_serializer = RecruitmentSerializer(recruitment, many=True)
         return Response(recruitment_serializer.data)

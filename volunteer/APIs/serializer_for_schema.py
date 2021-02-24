@@ -18,11 +18,13 @@ class VolunteerApplyReqeustSeriazlier(serializers.Serializer):
 
 
 class RecruitmentSearchSerializer(serializers.Serializer):
-    tags = serializers.CharField(required=False)
+    tag = serializers.CharField(required=False)
+    location = serializers.CharField(required=False)
 
     class Meta:
         field = [
-            'tags'
+            'tag',
+            'location'
         ]
 
 
@@ -35,6 +37,7 @@ class RecruitmentResponseSerializer(serializers.Serializer):
     shelter = serializers.IntegerField()
     shelter_name = serializers.CharField()
     shelter_thumbnail = serializers.CharField()
+    shelter_location = serializers.CharField()
 
     class Meta:
         field = '__all__'

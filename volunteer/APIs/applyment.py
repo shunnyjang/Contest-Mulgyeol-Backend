@@ -26,10 +26,10 @@ class VolunteerApplyView(APIView):
         """
         봉사 가능 날짜 확인 (30)
         """
-        volunteer_recruitment_calendar = Recruitment.objects.get(shelter=request.query_params['shelter'])
+        shelter_recruitment_post = Recruitment.objects.get(shelter=request.query_params['shelter'])
 
-        start_date = volunteer_recruitment_calendar.start_date
-        end_date = volunteer_recruitment_calendar.end_date
+        start_date = shelter_recruitment_post.start_date
+        end_date = shelter_recruitment_post.end_date
 
         volunteer_recruitment_calendar = DailyRecruitmentStatus.objects.filter(
             shelter=request.query_params['shelter'], date__gt=start_date, date__lte=end_date)

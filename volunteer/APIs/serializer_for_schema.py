@@ -18,11 +18,13 @@ class VolunteerApplyReqeustSeriazlier(serializers.Serializer):
 
 
 class RecruitmentSearchSerializer(serializers.Serializer):
-    tags = serializers.CharField(required=False)
+    tag = serializers.CharField(required=False)
+    location = serializers.CharField(required=False)
 
     class Meta:
         field = [
-            'tags'
+            'tag',
+            'location'
         ]
 
 
@@ -35,6 +37,7 @@ class RecruitmentResponseSerializer(serializers.Serializer):
     shelter = serializers.IntegerField()
     shelter_name = serializers.CharField()
     shelter_thumbnail = serializers.CharField()
+    shelter_location = serializers.CharField()
 
     class Meta:
         field = '__all__'
@@ -48,12 +51,16 @@ class RecruitmentPostRequestSerializer(serializers.Serializer):
         required=True,
         slug_field='text'
     )
+    start_date = serializers.DateField(required=True),
+    end_date = serializers.DateField(required=True)
 
     class Meta:
         field = [
             'image',
             'information',
-            'tags'
+            'tags',
+            'start_date',
+            'end_date'
         ]
 
 

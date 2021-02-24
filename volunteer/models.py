@@ -26,7 +26,7 @@ class Recruitment(models.Model):
     created_at = models.DateTimeField("업로드 날짜", auto_now=True)
     image = models.ImageField("첨부 이미지", upload_to=date_upload_to, null=True)
     information = models.TextField("봉사 설명", blank=True)
-    tags = models.ManyToManyField(Tag, verbose_name="태그")
+    tags = models.ManyToManyField(Tag, verbose_name="태그", related_name='recruitment')
 
     def __str__(self):
         return "[%s] %s 봉사모집" % (self.created_at, self.shelter)

@@ -22,7 +22,7 @@ class Tag(models.Model):
 
 
 class Recruitment(models.Model):
-    shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE)
+    shelter = models.OneToOneField(Shelter, on_delete=models.CASCADE)
     created_at = models.DateTimeField("업로드 날짜", auto_now=True)
     image = models.ImageField("첨부 이미지", upload_to=date_upload_to, null=True)
     information = models.TextField("봉사 설명", blank=True)

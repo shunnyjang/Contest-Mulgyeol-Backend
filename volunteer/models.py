@@ -46,6 +46,9 @@ class DailyRecruitmentStatus(models.Model):
     def __str__(self):
         return "[%s] %s (%d/%d)" % (self.date, self.shelter.shelter_name, self.shelter.limit_number, self.current_number)
 
+    class Meta:
+        ordering = ('-date',)
+
 
 class Volunteer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

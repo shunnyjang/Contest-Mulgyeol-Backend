@@ -103,8 +103,7 @@ class RecruitmentDetailView(APIView):
 
         # 태그 수정시 모두 삭제하고 재등록
         if request.data.get('tags'):
-            tags = recruitment.tags.all()
-            tags.delete()
+            recruitment.tags.clear()
             update_tag(request.data.get('tags'), recruitment)
 
         recruitment_serializer = RecruitmentSerializer(recruitment, data=request.data, partial=True)

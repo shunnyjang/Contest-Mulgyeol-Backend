@@ -43,9 +43,8 @@ class DailyRecruitmentStatus(models.Model):
     current_number = models.PositiveIntegerField(default=0, verbose_name="현재 인원")
     applicant = models.ManyToManyField(User)
 
-    class Meta:
-        def __str__(self):
-            return "[%s]%s(%d/%d)" % (self.date, self.shelter.shelter_name, self.need_number, self.current_number)
+    def __str__(self):
+        return "[%s] %s (%d/%d)" % (self.date, self.shelter.shelter_name, self.shelter.limit_number, self.current_number)
 
 
 class Volunteer(models.Model):

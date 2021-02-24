@@ -65,7 +65,7 @@ class RecruitmentView(APIView):
         recruitment_object = recruitment_serializer.save()  # 봉사 모집 포스트 업로드 완료
 
         update_tag(request.data.get('tags'), recruitment_object)
-        save_daily_recruitment_objects(user.shelter.pk,
+        save_daily_recruitment_objects(user.shelter,
                                        request.data.get('start_date'),
                                        request.data.get('end_date'))
         return Response({  # 포스트 업로드 & 태그 등록 완료

@@ -15,10 +15,10 @@ def update_tag(tags: str, recruitment: Recruitment):
             recruitment.tags.add(tag)
 
 
-def save_daily_recruitment_objects(shelter_pk, start_date, end_date):
-    start_date = datetime.date.strftime(start_date, '%Y-%m-%d')
-    end_date = datetime.date.strftime(end_date, '%Y-%m-%d')
+def save_daily_recruitment_objects(shelter, start_date, end_date):
+    start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+    end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
 
     while start_date <= end_date:
-        DailyRecruitmentStatus.objects.create(shelter=shelter_pk, date=start_date)
+        DailyRecruitmentStatus.objects.create(shelter=shelter, date=start_date)
         start_date += datetime.timedelta(days=1)

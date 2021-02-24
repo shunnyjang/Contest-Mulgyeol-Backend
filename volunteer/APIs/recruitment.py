@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.http import Http404
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
@@ -32,15 +33,18 @@ class RecruitmentView(APIView):
     )
     def get(self, request):
         search_tags = request.GET.getlist('tag', [])
-        search_location = request.GET.getlist('location', [])
+        search_locations = request.GET.getlist('location', [])
 
-        if search_tags:
-            recruitment = Recruitment.objects.filter(tags__text__in=search_tags)
+        if search_locations:
+            query = Q()
+            for search_location in search_locations:
+                query = query | Q(shelter__loc_short__startswith=search_location)
+            recruitment = Recruitment.objects.filter(query)
         else:
             recruitment = Recruitment.objects.all()
 
-        if search_location:
-            recruitment.filter(shelter__loc_short=search_location)
+        if search_tags:
+            recruitment = recruitment.filter(tags__text__in=search_tags)
 
         recruitment_serializer = RecruitmentSerializer(recruitment, many=True)
         return Response(recruitment_serializer.data)

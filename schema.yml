@@ -157,6 +157,17 @@ paths:
     get:
       operationId: auth_retrieve
       description: ''
+      parameters:
+      - in: query
+        name: auth_number
+        schema:
+          type: integer
+        required: true
+      - in: query
+        name: phone_number
+        schema:
+          type: string
+        required: true
       tags:
       - auth
       security:
@@ -166,12 +177,26 @@ paths:
       - {}
       responses:
         '200':
+          description: No response body
+        '400':
           description: No response body
     post:
       operationId: auth_create
       description: ''
       tags:
       - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneAuth'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PhoneAuth'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PhoneAuth'
+        required: true
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -180,10 +205,19 @@ paths:
       responses:
         '200':
           description: No response body
+        '400':
+          description: No response body
   /community/:
     get:
       operationId: community_retrieve
-      description: ''
+      description: 보호소에서 업로드했던 커뮤니티 글 (보호소 일상 글) 리스트를 반환하는 API입니다. query parameter로
+        shelter의 id를 포함하세요 (필수)
+      parameters:
+      - in: query
+        name: shelter
+        schema:
+          type: string
+        required: true
       tags:
       - community
       security:
@@ -192,10 +226,46 @@ paths:
       - basicAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Community'
+          description: ''
     post:
       operationId: community_create
-      description: ''
+      description: 보호소에서 커뮤니티 글을 업로드하는 API입니다.
+      tags:
+      - community
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityPostRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityPostRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Community'
+          description: ''
+  /community/{id}/:
+    get:
+      operationId: community_retrieve_2
+      description: 보호소에서 올린 커뮤니를 하나씩 보는 API입니다. 주소의 가장 마지막에 붙이는 숫자가 id인 모집 공고를 볼 수
+        있습니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
       tags:
       - community
       security:
@@ -204,11 +274,213 @@ paths:
       - basicAuth: []
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Community'
+          description: ''
+    patch:
+      operationId: community_partial_update
+      description: 해당 커뮤니티 글을 부분적으로 수정할 수 있는 API입니다. image, content(글)를 수정할 수 있습니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunity'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Community'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
+    delete:
+      operationId: community_destroy
+      description: 보호소에서 커뮤니티 포스트를 지우는 API입니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - community
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /community/charity/:
+    get:
+      operationId: community_charity_retrieve
+      description: 보호소에서 업로드했던 후원내역 리스트를 반환하는 API입니다. query parameter로 shelter의 id를
+        포함하세요 (필수)
+      parameters:
+      - in: query
+        name: shelter
+        schema:
+          type: string
+        required: true
+      tags:
+      - community
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Charity'
+          description: ''
+    post:
+      operationId: community_charity_create
+      description: ''
+      tags:
+      - community
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Charity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Charity'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
+  /community/charity/{id}/:
+    get:
+      operationId: community_charity_retrieve_2
+      description: 보호소에서 올린 커뮤니를 하나씩 보는 API입니다. 주소의 가장 마지막에 붙이는 숫자가 id인 모집 공고를 볼 수
+        있습니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - community
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Charity'
+          description: ''
+    patch:
+      operationId: community_charity_partial_update
+      description: 해당 커뮤니티 글을 부분적으로 수정할 수 있는 API입니다. image, content(글)를 수정할 수 있습니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCharity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCharity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCharity'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Charity'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
+    delete:
+      operationId: community_charity_destroy
+      description: 보호소에서 커뮤니티 포스트를 지우는 API입니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - community
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
           description: No response body
   /id/:
     get:
       operationId: id_retrieve
       description: ''
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: string
+        required: true
       tags:
       - id
       security:
@@ -218,6 +490,8 @@ paths:
       - {}
       responses:
         '200':
+          description: No response body
+        '400':
           description: No response body
   /login/:
     post:
@@ -232,27 +506,41 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/JSONWebToken'
+              $ref: '#/components/schemas/SignInRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/JSONWebToken'
+              $ref: '#/components/schemas/SignInRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/JSONWebToken'
+              $ref: '#/components/schemas/SignInRequest'
         required: true
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONWebToken'
+                $ref: '#/components/schemas/SignInResponse'
           description: ''
+        '400':
+          description: No response body
   /shelter/:
     post:
       operationId: shelter_create
       description: ''
       tags:
       - shelter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShelterCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ShelterCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ShelterCreateRequest'
+        required: true
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -260,7 +548,17 @@ paths:
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
   /shelter/{id}/:
     get:
       operationId: shelter_retrieve
@@ -279,10 +577,14 @@ paths:
       - basicAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shelter'
+          description: ''
     patch:
       operationId: shelter_partial_update
-      description: ''
+      description: 보호소 정보를 부분적으로 수정할 수 있는 API입니다. 수정하고자 하는 것만 request body로 포함하면 됩니다.
       parameters:
       - in: path
         name: id
@@ -291,31 +593,75 @@ paths:
         required: true
       tags:
       - shelter
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedShelter'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedShelter'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedShelter'
       security:
       - jwtAuth: []
       - cookieAuth: []
       - basicAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
   /signup/:
     post:
       operationId: signup_create
       description: ''
       tags:
       - signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
       security:
       - jwtAuth: []
       - cookieAuth: []
       - basicAuth: []
       - {}
       responses:
-        '200':
-          description: No response body
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
   /volunteer/:
     get:
       operationId: volunteer_retrieve
-      description: ''
+      description: "\n        전국의 보호소들이 올린 자원봉사자 모집 공고를 확인할 수 있는 API입니다. \n      \
+        \  parameter로 검색하고자 하는 tag들을 보내 검색할 수 있습니다.\n        tag는 여러 개 중첩 사용가능합니다.\
+        \ (OR로 검색 결과 반환)\n        "
+      parameters:
+      - in: query
+        name: tags
+        schema:
+          type: string
       tags:
       - volunteer
       security:
@@ -324,23 +670,47 @@ paths:
       - basicAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecruitmentResponse'
+          description: ''
     post:
       operationId: volunteer_create
-      description: ''
+      description: 보호소들이 자원 봉사자 모집 공고를 올릴 수 있는 API입니다.
       tags:
       - volunteer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecruitmentPostRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecruitmentPostRequest'
+        required: true
       security:
       - jwtAuth: []
       - cookieAuth: []
       - basicAuth: []
       responses:
-        '200':
-          description: No response body
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
   /volunteer/{id}/:
     get:
       operationId: volunteer_retrieve_2
-      description: ''
+      description: 보호소에서 올린 봉사 모집 공고를 하나씩 보는 API입니다. 주소의 가장 마지막에 붙이는 숫자가 id인 모집 공고를
+        볼 수 있습니다.
       parameters:
       - in: path
         name: id
@@ -355,10 +725,15 @@ paths:
       - basicAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recruitment'
+          description: ''
     patch:
       operationId: volunteer_partial_update
-      description: ''
+      description: 해당 모집 공고를 부분적으로 수정할 수 있는 API입니다. 수정하고자 하는 일부 field를 request에 포함하면
+        됩니다.
       parameters:
       - in: path
         name: id
@@ -367,17 +742,38 @@ paths:
         required: true
       tags:
       - volunteer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRecruitmentPostRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRecruitmentPostRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRecruitmentPostRequest'
       security:
       - jwtAuth: []
       - cookieAuth: []
       - basicAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recruitment'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
   /volunteer/apply/:
     get:
       operationId: volunteer_apply_retrieve
-      description: 봉사 가능 날짜 확인 (이번 달)
+      description: 봉사 가능 날짜 확인 (30)
       tags:
       - volunteer
       security:
@@ -386,23 +782,130 @@ paths:
       - basicAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyRecruitmentStatus'
+          description: ''
     post:
       operationId: volunteer_apply_create
       description: 봉사 신청
       tags:
       - volunteer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VolunteerApplyReqeustSeriazlier'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VolunteerApplyReqeustSeriazlier'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VolunteerApplyReqeustSeriazlier'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
+  /volunteer/daily/{id}/:
+    get:
+      operationId: volunteer_daily_retrieve
+      description: 보호소에서 올린 봉사 모집 공고를 하나씩 보는 API입니다. 주소의 가장 마지막에 붙이는 숫자가 id인 모집 공고를
+        볼 수 있습니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - volunteer
       security:
       - jwtAuth: []
       - cookieAuth: []
       - basicAuth: []
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyRecruitmentStatus'
+          description: ''
+    patch:
+      operationId: volunteer_daily_partial_update
+      description: 해당 모집 공고를 부분적으로 수정할 수 있는 API입니다. 그 날 필요한 인원수를 수정할 수 있습니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - volunteer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDailyRecruitmentDetailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDailyRecruitmentDetailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDailyRecruitmentDetailRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyRecruitmentStatus'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: ''
+    delete:
+      operationId: volunteer_daily_destroy
+      description: 보호소에서 올렸던 봉사 모집 날짜를 지우는 API입니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - volunteer
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
           description: No response body
   /volunteer/list/:
     get:
       operationId: volunteer_list_retrieve
-      description: ''
+      description: 사용자가 자신의 봉사신청 내역을 확인할 수 있는 API입니다.
       tags:
       - volunteer
       security:
@@ -411,11 +914,15 @@ paths:
       - basicAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolunteerResponse'
+          description: ''
   /volunteer/status/:
     get:
       operationId: volunteer_status_retrieve
-      description: ''
+      description: 보호소가 봉사신청한 봉사자 목록을 확인할 수 있는 API입니다.
       tags:
       - volunteer
       security:
@@ -424,17 +931,348 @@ paths:
       - basicAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyRecruitmentVolunteer'
+          description: ''
 components:
   schemas:
-    JSONWebToken:
+    ApiResponse:
       type: object
-      description: |-
-        Serializer class used to validate a username and password.
-
-        'username' is identified by the custom UserModel.USERNAME_FIELD.
-
-        Returns a JSON Web Token that can be used to authenticate later calls.
+      properties:
+        response:
+          type: string
+        message:
+          type: string
+      required:
+      - message
+      - response
+    Charity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        shelter:
+          type: integer
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/CharityImage'
+          readOnly: true
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - images
+    CharityImage:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+      required:
+      - image
+    Community:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        shelter:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        image:
+          type: string
+          format: uri
+        content:
+          type: string
+      required:
+      - created_at
+      - id
+      - shelter
+    CommunityPostRequest:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+        content:
+          type: string
+    DailyRecruitmentStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        shelter:
+          type: integer
+        date:
+          type: string
+          format: date
+        current_number:
+          type: integer
+      required:
+      - id
+      - shelter
+    DailyRecruitmentVolunteer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        shelter:
+          type: integer
+        date:
+          type: string
+          format: date
+        current_number:
+          type: integer
+        applicant:
+          type: array
+          items:
+            type: string
+      required:
+      - applicant
+      - id
+      - shelter
+    PatchedCharity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        shelter:
+          type: integer
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/CharityImage'
+          readOnly: true
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCommunity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        shelter:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        image:
+          type: string
+          format: uri
+        content:
+          type: string
+    PatchedDailyRecruitmentDetailRequest:
+      type: object
+      properties:
+        need_number:
+          type: integer
+    PatchedRecruitmentPostRequest:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+        information:
+          type: string
+        tags:
+          type: string
+    PatchedShelter:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: string
+        shelter_name:
+          type: string
+          maxLength: 20
+        loc_short:
+          type: string
+          maxLength: 15
+        loc_detail:
+          type: string
+          maxLength: 50
+        thumbnail:
+          type: string
+          format: uri
+          nullable: true
+        url:
+          type: string
+          maxLength: 200
+        chat_url:
+          type: string
+          maxLength: 200
+        status:
+          type: string
+          maxLength: 100
+        content:
+          type: string
+        caution:
+          type: string
+        limit_number:
+          type: integer
+    PhoneAuth:
+      type: object
+      properties:
+        phone_number:
+          type: string
+        auth_number:
+          type: integer
+          readOnly: true
+      required:
+      - auth_number
+      - phone_number
+    Recruitment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        image:
+          type: string
+          format: uri
+          nullable: true
+        information:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        shelter:
+          type: integer
+      required:
+      - created_at
+      - id
+      - shelter
+      - tags
+    RecruitmentPostRequest:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+        information:
+          type: string
+        tags:
+          type: string
+      required:
+      - tags
+    RecruitmentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        created_at:
+          type: string
+          format: date-time
+        image:
+          type: string
+          format: uri
+        information:
+          type: string
+        shelter:
+          type: integer
+        shelter_name:
+          type: string
+        shelter_thumbnail:
+          type: string
+      required:
+      - created_at
+      - id
+      - image
+      - information
+      - shelter
+      - shelter_name
+      - shelter_thumbnail
+      - tags
+    Shelter:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: string
+        shelter_name:
+          type: string
+          maxLength: 20
+        loc_short:
+          type: string
+          maxLength: 15
+        loc_detail:
+          type: string
+          maxLength: 50
+        thumbnail:
+          type: string
+          format: uri
+          nullable: true
+        url:
+          type: string
+          maxLength: 200
+        chat_url:
+          type: string
+          maxLength: 200
+        status:
+          type: string
+          maxLength: 100
+        content:
+          type: string
+        caution:
+          type: string
+        limit_number:
+          type: integer
+      required:
+      - id
+      - shelter_name
+      - user
+    ShelterCreateRequest:
+      type: object
+      properties:
+        profile:
+          $ref: '#/components/schemas/User'
+        shelter:
+          $ref: '#/components/schemas/Shelter'
+      required:
+      - profile
+      - shelter
+    SignInRequest:
+      type: object
       properties:
         userID:
           type: string
@@ -444,6 +1282,76 @@ components:
       required:
       - password
       - userID
+    SignInResponse:
+      type: object
+      properties:
+        token:
+          type: string
+    Tag:
+      type: object
+      properties:
+        text:
+          type: string
+          nullable: true
+          maxLength: 32
+    User:
+      type: object
+      properties:
+        userID:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        name:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+      required:
+      - name
+      - password
+      - phone
+      - role
+      - userID
+    VolunteerApplyReqeustSeriazlier:
+      type: object
+      properties:
+        shelter:
+          type: string
+        date:
+          type: string
+          format: date
+      required:
+      - date
+      - shelter
+    VolunteerResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          type: integer
+        applied_at:
+          type: string
+          format: date-time
+        applying_for:
+          type: integer
+        applying_date:
+          type: string
+          format: date
+        shelter_name:
+          type: string
+        shelter_chat_url:
+          type: string
+      required:
+      - applied_at
+      - applying_date
+      - applying_for
+      - id
+      - shelter_chat_url
+      - shelter_name
+      - user
   securitySchemes:
     basicAuth:
       type: http

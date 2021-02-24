@@ -21,6 +21,7 @@ class RecruitmentSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['shelter_name'] = instance.shelter.shelter_name
         response['shelter_thumbnail'] = str(instance.shelter.thumbnail)
+        response['shelter_location'] = instance.shelter.loc_short
         return response
 
     class Meta:
@@ -30,18 +31,12 @@ class RecruitmentSerializer(serializers.ModelSerializer):
 
 class DailyRecruitmentStatusSerializer(serializers.ModelSerializer):
 
-    def update(self, instance, validated_data):
-        instance.need_number = validated_data.get('need_number', instance.need_number)
-        instance.save()
-        return instance
-
     class Meta:
         model = DailyRecruitmentStatus
         fields = [
             "id",
             "shelter",
             "date",
-            "need_number",
             "current_number",
         ]
 
@@ -55,7 +50,6 @@ class DailyRecruitmentVolunteerSerializer(serializers.ModelSerializer):
             "id",
             "shelter",
             "date",
-            "need_number",
             "current_number",
             'applicant'
         ]

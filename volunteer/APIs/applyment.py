@@ -62,7 +62,7 @@ class VolunteerApplyView(APIView):
         except User.DoesNotExist:
             pass
 
-        if applying_for.current_number + 1 <= applying_for.need_number:
+        if applying_for.current_number + 1 <= applying_for.shelter.limit_number:
             applying_for.current_number += 1
             applying_for.applicant.add(user)
             applying_for.save()

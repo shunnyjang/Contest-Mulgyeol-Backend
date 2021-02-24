@@ -82,6 +82,7 @@ class Shelter(models.Model):
     status = models.CharField("동물 보호 현황", max_length=100, null=False, default="개 0마리")
     content = models.TextField("보호소 소개", blank=True)
     caution = models.TextField("봉사 주의사항", blank=True)
+    limit_number = models.PositiveIntegerField(blank=False, default=10)
 
     def __str__(self):
         return "(%d)[%s] %s" % (self.id, self.loc_short, self.shelter_name)

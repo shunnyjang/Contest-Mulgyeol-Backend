@@ -20,5 +20,5 @@ def save_daily_recruitment_objects(shelter, start_date, end_date):
     end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
 
     while start_date <= end_date:
-        DailyRecruitmentStatus.objects.create(shelter=shelter, date=start_date)
+        DailyRecruitmentStatus.objects.get_or_create(shelter=shelter, date=start_date)
         start_date += datetime.timedelta(days=1)

@@ -47,7 +47,7 @@ class DailyRecruitmentStatus(models.Model):
         return "[%s] %s (%d/%d)" % (self.date, self.shelter.shelter_name, self.shelter.limit_number, self.current_number)
 
     class Meta:
-        ordering = ('-date',)
+        ordering = ('date',)
 
 
 class Volunteer(models.Model):

@@ -13,10 +13,10 @@ from django.utils import timezone
 
 
 def date_upload_to(instance, filename):
-    # ymd_path = timezone.now().strftime('%Y/%m/%d')
-    path = "shelter" + str(instance.pk) + "_thumbnail"
+    shelter_dir_path = "shelter_thumbnail/" + str(instance.pk) + "/"
+    thumbnail_date_name = timezone.now().strftime('%Y-%m-%d-%H-%M-%S')
     extension = os.path.splitext(filename)[-1].lower()
-    return path + extension
+    return '/'.join([shelter_dir_path, thumbnail_date_name + extension, ])
 
 
 def thumbnail_upload_to(instance):
